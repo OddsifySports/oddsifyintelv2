@@ -195,7 +195,7 @@
       const newsRes = newsByLeague[league.id] || { ok: false };
       const newsItems = newsRes.ok && Array.isArray(newsRes.data.articles) ? newsRes.data.articles.slice(0, 5) : [];
       const wxPill = wx
-        ? '<span class="weather-pill"><span class="wx-temp">' + escapeHtml(wx.temp || "") + '</span><span>' + escapeHtml(wx.detail || "") + '</span></span>'
+        ? '<span class="weather-pill"><span class="wx-temp">' + escapeHtml(wx.temp || "") + '</span>' + (wx.detail ? ' <span>·</span> <span>' + escapeHtml(wx.detail) + '</span>' : '') + '</span>'
         : '<span class="weather-pill none">dome / no wx</span>';
       const itemsHtml = newsItems.length
         ? newsItems.map((a) => {
