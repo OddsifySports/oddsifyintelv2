@@ -368,8 +368,11 @@ const Render = (() => {
     if (!w || (w.temperature === undefined && !w.displayValue)) return null;
     const temp = w.temperature !== undefined ? `${w.temperature}°F` : w.displayValue;
     const bits = [];
-    if (w.highTemperature !== undefined && w.highTemperature !== w.temperature) bits.push(`high ${w.highTemperature}°F`);
-    if (w.conditionId !== undefined && w.displayValue) bits.push(w.displayValue);
+    // ESPN's weather object has BOTH a temperature (numeric, e.g. 76) AND a
+    // displayValue (which on the scoreboard endpoint is a numeric wind-speed
+    // or similar metric, NOT a description). Use conditionId as the human
+    // description. If neither is present, fall back to a generic note.
+    if (w.conditionId && typeof w.conditionId === "string") bits.push(w.conditionId);
     if (w.gust) bits.push(`gusts ${w.gust}mph`);
     return { temp, detail: bits.join(" · ") || "conditions at kickoff" };
   }
