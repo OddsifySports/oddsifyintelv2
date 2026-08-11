@@ -220,9 +220,299 @@
   }
 </style>
 <!-- V2 chrome styles (header, clock, tabs, ticker, layout) -->
-  <style id="v2-chrome"></style>
+  <style id="v2-chrome">
+    /* ---------- settings cog button ---------- */
+    .btn-settings {
+      background: transparent;
+      border: 1px solid var(--line);
+      color: var(--text-dim);
+      font-size: 14px;
+      width: 26px; height: 26px;
+      display: inline-flex; align-items: center; justify-content: center;
+      border-radius: 50%;
+      cursor: pointer;
+      margin-left: 8px;
+      padding: 0;
+      transition: color .15s, border-color .15s;
+    }
+    .btn-settings:hover { color: var(--gold); border-color: var(--gold-dim); }
+
+    /* ---------- league filter chips ---------- */
+    .league-filter {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+    }
+    .league-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      color: var(--text-dim);
+      font-family: var(--font-display);
+      font-size: 14px;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      user-select: none;
+      transition: background .15s, color .15s, border-color .15s;
+    }
+    .league-chip:hover { color: var(--text); border-color: var(--gold-dim); }
+    .league-chip .league-chip-logo {
+      width: 16px; height: 16px;
+      object-fit: contain;
+      filter: grayscale(1) brightness(0.7);
+      transition: filter .15s;
+    }
+    .league-chip.on { background: var(--gold-dim); color: var(--ink); border-color: var(--gold); }
+    .league-chip.on .league-chip-logo { filter: none; }
+    .league-filter-empty { color: var(--text-faint); font-size: 13px; padding: 4px 2px; }
+
+    /* ---------- settings modal ---------- */
+    .settings-modal { max-width: 540px; width: 100%; }
+    .settings-title {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 26px;
+      letter-spacing: 0.04em;
+      color: var(--gold);
+      margin: 4px 0 4px;
+    }
+    .settings-sub { color: var(--text-faint); font-size: 13px; margin-bottom: 22px; }
+    .settings-section { margin-bottom: 22px; }
+    .settings-label {
+      display: block;
+      font-family: var(--font-display);
+      font-size: 14px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .settings-help { color: var(--text-faint); font-size: 12px; margin: 0 0 10px; }
+    .settings-select, .settings-input {
+      width: 100%;
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-family: inherit;
+      font-size: 14px;
+    }
+    .settings-input:focus, .settings-select:focus {
+      outline: 2px solid var(--gold-dim);
+      outline-offset: 1px;
+    }
+    .settings-leagues {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .settings-league-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      color: var(--text-dim);
+      cursor: pointer;
+      user-select: none;
+      transition: background .12s, border-color .12s, color .12s;
+    }
+    .settings-league-toggle .settings-league-logo {
+      width: 18px; height: 18px;
+      object-fit: contain;
+    }
+    .settings-league-toggle.on {
+      background: var(--gold-dim);
+      color: var(--ink);
+      border-color: var(--gold);
+    }
+    .settings-league-toggle:not(.on):hover {
+      border-color: var(--gold-dim);
+      color: var(--text);
+    }
+    .settings-league-actions { color: var(--text-faint); font-size: 12px; }
+    .settings-link {
+      background: none; border: none; padding: 0;
+      color: var(--text-faint);
+      font: inherit;
+      cursor: pointer;
+      text-decoration: underline dotted;
+      text-underline-offset: 3px;
+    }
+    .settings-link:hover { color: var(--gold); }
+    .settings-sep { color: var(--text-faint); margin: 0 6px; }
+    .settings-footer { display: flex; justify-content: flex-end; margin-top: 8px; }
+    .settings-done-btn {
+      background: var(--gold);
+      color: var(--ink);
+      border: none;
+      padding: 10px 22px;
+      border-radius: 6px;
+      font-family: var(--font-display);
+      font-size: 16px;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+    }
+    .settings-done-btn:hover { background: var(--gold-dim); }
+
+    /* ---------- news + weather combined cards ---------- */
+    .around-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    @media (max-width: 980px) { .around-grid { grid-template-columns: 1fr; } }
+    .around-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .around-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 14px;
+      background: var(--panel-hi);
+      border-bottom: 1px solid var(--line);
+    }
+    .around-head .league-id {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-display);
+      font-size: 18px;
+      letter-spacing: 0.06em;
+      color: var(--text);
+    }
+    .around-head .league-id img { width: 22px; height: 22px; object-fit: contain; }
+    .around-head .weather-pill {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-dim);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .around-head .weather-pill .wx-temp { color: var(--gold); font-weight: 600; }
+    .around-head .weather-pill.none { color: var(--text-faint); }
+    .around-body {
+      padding: 10px 14px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .news-item-large {
+      display: block;
+      padding: 10px 0;
+      border-top: 1px solid var(--line);
+      color: var(--text);
+      text-decoration: none;
+      transition: background .12s;
+    }
+    .news-item-large:first-child { border-top: none; padding-top: 4px; }
+    .news-item-large:hover { background: rgba(255,255,255,0.03); }
+    .news-item-large .headline {
+      font-size: 14.5px;
+      line-height: 1.35;
+      margin-bottom: 4px;
+      color: var(--paper);
+    }
+    .news-item-large .meta {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-faint);
+    }
+    .news-item-large .meta .src {
+      color: var(--gold);
+      text-transform: uppercase;
+    }
+    .news-empty { color: var(--text-faint); font-size: 13px; padding: 8px 2px; }
+
+    /* ---------- injuries empty state ---------- */
+    .injuries-empty {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 30px 24px;
+      text-align: center;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+    }
+    .injuries-empty .big {
+      font-family: var(--font-display);
+      font-size: 22px;
+      letter-spacing: 0.04em;
+      color: var(--text);
+      margin-bottom: 14px;
+    }
+    .injuries-empty p { color: var(--text-faint); font-size: 13.5px; line-height: 1.55; margin: 10px 0; }
+    .injuries-empty p.sub { font-size: 12px; margin-top: 18px; }
+    .injury-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 14px;
+    }
+    .injury-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--panel-hi);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: var(--font-display);
+      font-size: 14px;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+      transition: background .12s, border-color .12s, color .12s;
+    }
+    .injury-link:hover { background: var(--gold-dim); border-color: var(--gold); color: var(--ink); }
+    .injury-link img { width: 18px; height: 18px; object-fit: contain; }
+    .injury-link .arrow { color: var(--gold); font-weight: 600; }
+    .injury-link:hover .arrow { color: var(--ink); }
+    .injury-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 6px 0;
+      border-top: 1px solid var(--line);
+      font-size: 13px;
+      align-items: center;
+    }
+    .injury-name { color: var(--paper); font-weight: 600; }
+    .injury-status {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--gold);
+      text-transform: uppercase;
+    }
+    .injury-detail { color: var(--text-faint); font-size: 12px; flex-basis: 100%; padding-left: 0; }
+  </style>
   <!-- V1 content styles (game-card, weather-card, league-section, modal, news-grid) -->
-  <link rel="stylesheet" href="css/styles.css?v=5">
+  <link rel="stylesheet" href="css/styles.css?v=6">
 </head>
 <body>
 
@@ -245,9 +535,10 @@
       <span class="divider" aria-hidden="true">·</span>
       <span id="lastUpdated">—</span>
       <button id="refreshBtn" class="btn-refresh" type="button" aria-label="Refresh all data now">REFRESH</button>
+      <button id="settingsBtn" class="btn-settings" type="button" aria-label="Open settings" title="Settings">⚙</button>
     </div>
     <div class="clockbox">
-      <div class="place">Phoenix, AZ · MST</div>
+      <div class="place" id="clockPlace">Phoenix, AZ · MST</div>
       <div class="time" id="clockTime">--:--</div>
       <div class="date" id="clockDate">Loading date…</div>
     </div>
@@ -257,9 +548,8 @@
     <div class="tabbar" id="tabbar">
       <button class="tab-btn active" data-tab="games" id="btnGames">Games</button>
       <button class="tab-btn" data-tab="live"><span class="dot live-pulse"></span> Live</button>
-      <button class="tab-btn" data-tab="news" id="btnNews">News</button>
+      <button class="tab-btn" data-tab="news" id="btnNews">News &amp; Weather</button>
       <button class="tab-btn" data-tab="injuries" id="btnInjuries">Injuries</button>
-      <button class="tab-btn" data-tab="weather" id="btnWeather">Weather</button>
     </div>
   </div>
 
@@ -269,6 +559,9 @@
     <section class="panel-view active" id="view-games">
       <div class="section-title">Today's Schedule</div>
       <div class="section-sub">Live scores &amp; lineups across every tracked league. Times shown in your local browser timezone (override per-league where ESPN publishes ET).</div>
+      <div class="league-filter" id="leagueFilter" role="toolbar" aria-label="Filter by league">
+        <!-- chips injected by js/app.js -->
+      </div>
       <div id="gamesContainer"></div>
     </section>
 
@@ -279,25 +572,18 @@
       <div class="grid" id="liveContainer"></div>
     </section>
 
-    <!-- ================= NEWS TAB ================= -->
+    <!-- ================= NEWS + WEATHER TAB ================= -->
     <section class="panel-view" id="view-news">
-      <div class="section-title">League News</div>
-      <div class="section-sub">Top storylines making headlines today, by league. Tap a source pill to read the full story.</div>
+      <div class="section-title">Around the Leagues</div>
+      <div class="section-sub">Top headlines and venue weather for every tracked league, side by side. Tap any card for the full story.</div>
       <div id="newsContainer"></div>
     </section>
 
     <!-- ================= INJURIES TAB ================= -->
     <section class="panel-view" id="view-injuries">
       <div class="section-title">Injury Report</div>
-      <div class="section-sub">Notable injury and availability updates from today's reporting.</div>
+      <div class="section-sub" id="injuriesSub">Notable injury and availability updates from today's reporting.</div>
       <div id="injuriesContainer"></div>
-    </section>
-
-    <!-- ================= WEATHER TAB ================= -->
-    <section class="panel-view" id="view-weather">
-      <div class="section-title">Weather at Today's Venues</div>
-      <div class="section-sub">Live conditions for every outdoor venue playing today, by league. Indoor / dome games are listed without weather.</div>
-      <div id="weatherContainer"></div>
     </section>
 
   </main>
@@ -311,6 +597,42 @@
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
       <button class="modal-close" id="modal-close" type="button" aria-label="Close game details">✕</button>
       <div id="modal-body"><p class="empty-note">Loading…</p></div>
+    </div>
+  </div>
+
+  <!-- ================= SETTINGS MODAL ================= -->
+  <div class="modal-overlay" id="settings-overlay" hidden>
+    <div class="modal settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <button class="modal-close" id="settings-close" type="button" aria-label="Close settings">✕</button>
+      <h2 class="settings-title" id="settings-title">Settings</h2>
+      <p class="settings-sub">Personalize your Oddsify Intel dashboard. Changes save automatically.</p>
+
+      <section class="settings-section">
+        <label class="settings-label" for="settings-tz">Time zone</label>
+        <p class="settings-help">Used for the clock in the header and the times shown on each game card.</p>
+        <select id="settings-tz" class="settings-select"></select>
+      </section>
+
+      <section class="settings-section">
+        <label class="settings-label" for="settings-location">Location label</label>
+        <p class="settings-help">Free-form. Shown under the clock and at the top of weather/news cards.</p>
+        <input id="settings-location" class="settings-input" type="text" maxlength="48" placeholder="Phoenix, AZ" />
+      </section>
+
+      <section class="settings-section">
+        <label class="settings-label">Tracked leagues</label>
+        <p class="settings-help">Toggle the sports you want on the dashboard. Disabled leagues are hidden everywhere — Games, News, Injuries, Weather, and the ticker.</p>
+        <div id="settings-leagues" class="settings-leagues"></div>
+        <div class="settings-league-actions">
+          <button id="settings-all" class="settings-link" type="button">Select all</button>
+          <span class="settings-sep">·</span>
+          <button id="settings-none" class="settings-link" type="button">Clear</button>
+        </div>
+      </section>
+
+      <div class="settings-footer">
+        <button id="settings-done" class="settings-done-btn" type="button">Done</button>
+      </div>
     </div>
   </div>
 

@@ -125,10 +125,21 @@ const Store = (() => {
 
   /* ---------------- settings ---------------- */
   const SETTINGS_KEY = "oi:settings";
-  const DEFAULT_SETTINGS = { tickerEnabled: true, tickerSpeed: "normal" };
+  const DEFAULT_SETTINGS = {
+    tickerEnabled: true,
+    tickerSpeed: "normal",
+    timezone: "America/Phoenix",
+    location: "Phoenix, AZ",
+    enabledLeagues: null, // null = all leagues enabled (first-run default)
+  };
 
   function getSettings() {
-    return { ...DEFAULT_SETTINGS, ...readJSON(SETTINGS_KEY, {}) };
+    const s = readJSON(SETTINGS_KEY, {});
+    // If enabledLeagues hasn't been initialised yet, default to all league IDs
+    if (!("enabledLeagues" in s)) {
+      s.enabledLeagues = (typeof LEAGUES !== "undefined") ? LEAGUES.map((l) => l.id) : [];
+    }
+    return { ...DEFAULT_SETTINGS, ...s, enabledLeagues: s.enabledLeagues };
   }
   function setSetting(key, value) {
     const s = getSettings();
@@ -136,6 +147,44 @@ const Store = (() => {
     writeJSON(SETTINGS_KEY, s);
     return s;
   }
+  function setManySettings(patch) {
+    const s = getSettings();
+    Object.assign(s, patch);
+    writeJSON(SETTINGS_KEY, s);
+    return s;
+  }
+  function isLeagueEnabled(leagueId) {
+    const list = getSettings().enabledLeagues;
+    return Array.isArray(list) && list.includes(leagueId);
+  }
+  function setEnabledLeagues(ids) {
+    return setSetting("enabledLeagues", ids);
+  }
+  function toggleLeague(leagueId) {
+    const s = getSettings();
+    const set = new Set(s.enabledLeagues || []);
+    if (set.has(leagueId)) set.delete(leagueId);
+    else set.add(leagueId);
+    return setEnabledLeagues([...set]);
+  }
+
+  // Common US-ish timezones for the settings picker. Browsers give us
+  // Intl.supportedValuesOf("timeZone") but a curated list is friendlier.
+  const COMMON_TIMEZONES = [
+    "America/Phoenix",
+    "America/Los_Angeles",
+    "America/Denver",
+    "America/Chicago",
+    "America/New_York",
+    "America/Toronto",
+    "America/Mexico_City",
+    "Europe/London",
+    "Europe/Madrid",
+    "Europe/Berlin",
+    "Asia/Tokyo",
+    "Australia/Sydney",
+    "UTC",
+  ];
 
   return {
     getWatchlist,
@@ -147,5 +196,10 @@ const Store = (() => {
     getLog,
     getSettings,
     setSetting,
+    setManySettings,
+    isLeagueEnabled,
+    setEnabledLeagues,
+    toggleLeague,
+    COMMON_TIMEZONES,
   };
 })();
