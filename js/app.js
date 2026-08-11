@@ -123,8 +123,12 @@
       return;
     }
     let anyRendered = false;
-    filtered.forEach(({ league, scoreboardData }) => {
-      const events = (scoreboardData && scoreboardData.events) || [];
+    filtered.forEach((league) => {
+      // enabledLeagues() returns bare LEAGUES entries (no scoreboardData);
+      // join back to lastResults by id to get the events.
+      const result = lastResults.find((r) => r.league.id === league.id);
+      if (!result) return;
+      const events = (result.scoreboardData && result.scoreboardData.events) || [];
       if (!events.length) return;
       anyRendered = true;
       const section = document.createElement("div");
@@ -142,10 +146,13 @@
     container.innerHTML = "";
     const filtered = enabledLeagues();
     const liveResults = filtered
-      .map(({ league, scoreboardData }) => {
-        const events = ((scoreboardData && scoreboardData.events) || []).filter((e) => safeState(e) === "in");
+      .map((league) => {
+        const result = lastResults.find((r) => r.league.id === league.id);
+        if (!result) return null;
+        const events = ((result.scoreboardData && result.scoreboardData.events) || []).filter((e) => safeState(e) === "in");
         return { league, events };
       })
+      .filter(Boolean)
       .filter((r) => r.events.length);
     if (!liveResults.length) {
       container.innerHTML = '<div class="live-empty"><div class="big">Nothing live right now</div>Check the Games tab for today\'s full schedule.</div>';
