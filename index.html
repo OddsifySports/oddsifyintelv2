@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Today In Sports — Phoenix, AZ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0A0E14;
+    --panel:#121926;
+    --panel-raised:#1A2331;
+    --panel-hi:#212C3D;
+    --line: rgba(140,160,190,0.14);
+    --line-strong: rgba(140,160,190,0.26);
+    --text:#F2F5F9;
+    --text-dim:#8D98AC;
+    --text-faint:#5C6779;
+    --live:#2FE88A;
+    --live-dim: rgba(47,232,138,0.14);
+    --red:#FF4B3E;
+    --red-dim: rgba(255,75,62,0.14);
+    --gold:#FFB93D;
+    --gold-dim: rgba(255,185,61,0.14);
+    --blue:#4FA8FF;
+    --radius:14px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{background:var(--ink); color:var(--text); font-family:'Inter',sans-serif; -webkit-font-smoothing:antialiased;}
+  body{
+    background-image:
+      radial-gradient(1100px 600px at 12% -8%, rgba(47,232,138,0.06), transparent 55%),
+      radial-gradient(900px 520px at 100% 0%, rgba(79,168,255,0.06), transparent 50%);
+    padding-bottom:80px;
+  }
+  ::selection{ background: var(--gold-dim); color:var(--gold); }
+  a{color:inherit; text-decoration:none;}
+  .mono{ font-family:'JetBrains Mono', monospace; }
+  .display{ font-family:'Teko', sans-serif; font-weight:600; letter-spacing:0.01em; }
+  svg{ display:block; }
+
+  /* ---------- TICKER ---------- */
+  .ticker-wrap{
+    background:#000; border-bottom:1px solid var(--line-strong);
+    overflow:hidden; white-space:nowrap; height:34px; display:flex; align-items:center;
+  }
+  .ticker-tag{
+    flex:0 0 auto; background:var(--red); color:#fff; font-family:'Inter',sans-serif;
+    font-weight:800; font-size:11px; letter-spacing:0.09em; padding:6px 12px; height:100%;
+    display:flex; align-items:center; z-index:2;
+  }
+  .ticker-track{ display:flex; align-items:center; animation: scroll-left 46s linear infinite; }
+  .ticker-track span{ padding:0 22px; font-size:12.5px; color:#c9d3e0; font-family:'JetBrains Mono',monospace; letter-spacing:0.02em; }
+  .ticker-track span b{ color:#fff; font-weight:700; }
+  .ticker-track span.tag-live{ color:var(--live); }
+  @keyframes scroll-left{ 0%{ transform:translateX(0); } 100%{ transform:translateX(-50%); } }
+
+  /* ---------- HEADER ---------- */
+  header.top{
+    padding:26px 28px 18px; display:flex; justify-content:space-between; align-items:flex-end;
+    flex-wrap:wrap; gap:16px; max-width:1240px; margin:0 auto;
+  }
+  .brand{ display:flex; align-items:center; gap:12px; }
+  .brand .mark{
+    width:42px; height:42px; border-radius:10px; background:linear-gradient(155deg,var(--live),#18a865);
+    display:flex; align-items:center; justify-content:center; flex:0 0 auto;
+  }
+  .brand h1{ font-family:'Teko',sans-serif; font-weight:600; font-size:30px; letter-spacing:0.01em; line-height:1; }
+  .brand .sub{ font-size:11.5px; color:var(--text-dim); letter-spacing:0.04em; margin-top:3px; }
+  .clockbox{ text-align:right; }
+  .clockbox .place{ font-size:11px; color:var(--text-dim); letter-spacing:0.08em; text-transform:uppercase; margin-bottom:2px;}
+  .clockbox .time{ font-family:'JetBrains Mono',monospace; font-size:22px; font-weight:700; color:var(--gold); }
+  .clockbox .date{ font-size:12px; color:var(--text-dim); margin-top:2px;}
+
+  /* ---------- TABS ---------- */
+  .tabbar-wrap{ position:sticky; top:0; z-index:50; background:rgba(10,14,20,0.92); backdrop-filter: blur(10px); border-bottom:1px solid var(--line);}
+  .tabbar{ max-width:1240px; margin:0 auto; display:flex; gap:6px; padding:10px 28px; overflow-x:auto; }
+  .tab-btn{
+    font-family:'Inter',sans-serif; font-weight:700; font-size:13px; letter-spacing:0.02em;
+    color:var(--text-dim); background:transparent; border:1px solid transparent; padding:9px 16px;
+    border-radius:999px; cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:7px;
+    transition: all .15s ease;
+  }
+  .tab-btn:hover{ color:var(--text); background:var(--panel); }
+  .tab-btn.active{ background:var(--live-dim); color:var(--live); border-color: rgba(47,232,138,0.35); }
+  .tab-btn .dot{ width:6px; height:6px; border-radius:50%; background:var(--red); box-shadow:0 0 0 3px var(--red-dim); }
+  .tab-btn.active .dot.live-pulse{ animation: pulse 1.6s infinite; }
+  @keyframes pulse{ 0%{ box-shadow:0 0 0 0 rgba(255,75,62,0.5);} 70%{ box-shadow:0 0 0 8px rgba(255,75,62,0);} 100%{box-shadow:0 0 0 0 rgba(255,75,62,0);} }
+
+  main{ max-width:1240px; margin:0 auto; padding:24px 28px 10px; }
+  .panel-view{ display:none; animation: fadeIn .35s ease; }
+  .panel-view.active{ display:block; }
+  @keyframes fadeIn{ from{ opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+  /* ---------- LEAGUE FILTER CHIPS ---------- */
+  .chips{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:22px; }
+  .chip{
+    font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:500; padding:7px 14px 7px 10px;
+    border-radius:8px; background:var(--panel); border:1px solid var(--line); color:var(--text-dim);
+    cursor:pointer; display:flex; align-items:center; gap:8px; transition:.15s ease;
+  }
+  .chip:hover{ border-color:var(--line-strong); color:var(--text); }
+  .chip.active{ background:var(--panel-hi); border-color:var(--gold); color:var(--gold); }
+  .chip .n{ background:rgba(255,255,255,0.08); padding:1px 6px; border-radius:5px; font-size:10.5px; }
+  .chip.active .n{ background:var(--gold-dim); color:var(--gold); }
+  .chip svg{ width:15px; height:15px; opacity:0.85; }
+  .chip .emblem{ width:18px; height:18px; flex:0 0 auto; }
+
+  /* ---------- LEAGUE SECTION ---------- */
+  .league-section{ margin-bottom:34px; }
+  .league-head{ display:flex; align-items:center; gap:11px; margin-bottom:13px; }
+  .league-head .emblem{ width:38px; height:38px; flex:0 0 auto; }
+  .league-head h2{ font-family:'Teko',sans-serif; font-weight:600; font-size:22px; letter-spacing:0.02em; }
+  .league-head .count{ font-size:11.5px; color:var(--text-faint); font-family:'JetBrains Mono',monospace; }
+
+  .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:14px; }
+
+  /* ---------- GAME CARD ---------- */
+  .card{
+    position:relative; background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    padding:16px 16px 14px; overflow:hidden; transition:.18s ease;
+  }
+  .card:hover{ border-color:var(--line-strong); transform:translateY(-2px); box-shadow:0 10px 24px rgba(0,0,0,0.35);}
+  .card::before{ content:""; position:absolute; top:10px; right:10px; width:5px; height:5px; border-radius:50%; background:var(--line-strong); box-shadow: -10px 0 0 var(--line-strong); }
+  .card-status{ display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+  .badge{ font-size:10.5px; font-weight:800; letter-spacing:0.08em; padding:3px 8px; border-radius:5px; font-family:'Inter',sans-serif;}
+  .badge.live{ background:var(--red-dim); color:var(--red); display:flex; align-items:center; gap:5px; }
+  .badge.live .d{ width:6px; height:6px; border-radius:50%; background:var(--red); animation:pulse 1.6s infinite; }
+  .badge.final{ background:rgba(140,160,190,0.12); color:var(--text-dim); }
+  .badge.sched{ background:var(--gold-dim); color:var(--gold); }
+  .card-time{ font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--text-dim); }
+  .matchup{ display:flex; flex-direction:column; gap:9px; margin-bottom:10px; }
+  .team-row{ display:flex; justify-content:space-between; align-items:center; }
+  .team-name{ display:flex; align-items:center; gap:10px; }
+  .badge-mono{ width:32px; height:32px; border-radius:9px; flex:0 0 auto; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12); }
+  .badge-mono .sh{ position:absolute; top:-14px; left:-10px; width:34px; height:34px; background:rgba(255,255,255,0.16); border-radius:50%; filter:blur(1px); }
+  .badge-mono span{ font-family:'Teko',sans-serif; font-weight:700; font-size:14.5px; color:#fff; letter-spacing:0.01em; z-index:1; text-shadow:0 1px 2px rgba(0,0,0,0.25); }
+  .team-txt .ab{ font-family:'Teko',sans-serif; font-weight:600; font-size:20px; letter-spacing:0.02em; display:block; line-height:1.05; }
+  .team-txt .full{ font-size:10.5px; color:var(--text-faint); }
+  .score{ font-family:'JetBrains Mono',monospace; font-size:20px; font-weight:700; color:var(--text); min-width:26px; text-align:right; }
+  .score.dim{ color:var(--text-faint); font-weight:500; }
+  .card-foot{ display:flex; justify-content:space-between; align-items:center; padding-top:10px; border-top:1px solid var(--line); font-size:11px; color:var(--text-faint); gap:10px; }
+  .card-foot .venue{ display:flex; align-items:center; gap:7px; overflow:hidden; }
+  .card-foot .venue svg{ width:16px; height:16px; flex:0 0 auto; opacity:0.8; }
+  .card-foot .venue span{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+  /* Off-day panel */
+  .offday{
+    background:var(--panel); border:1px dashed var(--line-strong); border-radius:var(--radius);
+    padding:22px 20px; display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;
+  }
+  .offday .l h3{ font-family:'Teko',sans-serif; font-size:20px; font-weight:600; color:var(--text-dim); letter-spacing:0.02em; }
+  .offday .l p{ font-size:12.5px; color:var(--text-faint); margin-top:3px; max-width:460px; }
+  .offday .r{ text-align:right; }
+  .offday .r .lbl{ font-size:10.5px; color:var(--text-faint); letter-spacing:0.08em; text-transform:uppercase; }
+  .offday .r .val{ font-family:'JetBrains Mono',monospace; color:var(--gold); font-size:15px; margin-top:2px; }
+
+  /* ---------- NEWS / INJURY LIST ---------- */
+  .feed-item{
+    display:flex; gap:14px; padding:15px 4px; border-bottom:1px solid var(--line);
+  }
+  .feed-item:last-child{ border-bottom:none; }
+  .feed-tag{ flex:0 0 54px; font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-faint); padding-top:2px; letter-spacing:0.05em;}
+  .feed-body h4{ font-size:14.5px; font-weight:700; margin-bottom:4px; line-height:1.35; }
+  .feed-body p{ font-size:12.8px; color:var(--text-dim); line-height:1.55; }
+  .feed-body .src{ font-size:10.5px; color:var(--text-faint); margin-top:7px; display:inline-flex; align-items:center; gap:5px; padding:4px 9px; border:1px solid var(--line); border-radius:999px; transition:.15s; }
+  a.src:hover{ color:var(--gold); border-color:var(--gold); }
+  .src svg{ width:10px; height:10px; }
+  .feed-block{ background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:6px 18px; margin-bottom:20px; }
+
+  .status-pill{ font-size:10px; font-weight:800; letter-spacing:0.05em; padding:2px 7px; border-radius:5px; margin-left:8px; vertical-align:middle;}
+  .status-pill.out{ background:var(--red-dim); color:var(--red); }
+  .status-pill.il{ background:var(--gold-dim); color:var(--gold); }
+  .status-pill.watch{ background:rgba(79,168,255,0.14); color:var(--blue); }
+  .status-pill.clear{ background:var(--live-dim); color:var(--live); }
+
+  /* ---------- WEATHER ---------- */
+  .wx-hero{
+    background:linear-gradient(160deg, var(--panel-hi), var(--panel));
+    border:1px solid var(--line); border-radius:18px; padding:28px; display:flex; justify-content:space-between;
+    align-items:center; margin-bottom:22px; flex-wrap:wrap; gap:20px;
+  }
+  .wx-hero .left{ display:flex; align-items:center; gap:18px; }
+  .wx-hero .left .icon{ width:64px; height:64px; }
+  .wx-hero .left .eyebrow{ font-size:11px; letter-spacing:0.1em; color:var(--text-dim); text-transform:uppercase; margin-bottom:6px;}
+  .wx-hero .left .temp{ font-family:'Teko',sans-serif; font-size:78px; font-weight:600; line-height:0.9; color:var(--text); }
+  .wx-hero .left .cond{ font-size:14px; color:var(--text-dim); margin-top:6px; }
+  .wx-hero .right{ text-align:right; }
+  .wx-hero .right .hl{ font-family:'JetBrains Mono',monospace; font-size:15px; color:var(--gold); }
+  .wx-hero .right .lo{ font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--blue); margin-top:4px; }
+  .wx-hero .right .precip{ font-size:11.5px; color:var(--text-faint); margin-top:8px; }
+  .wx-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:14px; }
+  .wx-card{ background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:16px; }
+  .wx-card .top-row{ display:flex; justify-content:space-between; align-items:flex-start; }
+  .wx-card .city{ font-family:'Teko',sans-serif; font-size:19px; font-weight:600; }
+  .wx-card .note{ font-size:10.5px; color:var(--text-faint); margin-bottom:4px; }
+  .wx-card .icon{ width:34px; height:34px; flex:0 0 auto; }
+  .wx-card .t{ font-family:'JetBrains Mono',monospace; font-size:26px; font-weight:700; color:var(--text); margin-top:6px;}
+  .wx-card .c{ font-size:12px; color:var(--text-dim); margin-top:2px; }
+  .wx-card .range{ font-size:11px; color:var(--text-faint); margin-top:8px; font-family:'JetBrains Mono',monospace; }
+
+  /* ---------- LIVE TAB ---------- */
+  .live-empty{ text-align:center; padding:60px 20px; color:var(--text-faint); }
+  .live-empty .big{ font-family:'Teko',sans-serif; font-size:26px; color:var(--text-dim); margin-bottom:6px;}
+
+  .section-title{ font-family:'Teko',sans-serif; font-weight:600; font-size:24px; letter-spacing:0.02em; margin-bottom:4px; display:flex; align-items:center; gap:10px;}
+  .section-sub{ font-size:12.5px; color:var(--text-faint); margin-bottom:20px; }
+
+  footer{ max-width:1240px; margin:40px auto 0; padding:20px 28px; border-top:1px solid var(--line); color:var(--text-faint); font-size:11px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;}
+
+  @media (max-width: 620px){
+    .wx-hero .left .temp{ font-size:52px; }
+    .wx-hero .left{ gap:12px; }
+    .wx-hero .left .icon{ width:46px; height:46px; }
+    .brand h1{ font-size:24px; }
+    header.top{ padding:20px 16px 14px; }
+    main{ padding:18px 16px 10px; }
+    .tabbar{ padding:10px 16px; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="ticker-wrap">
+    <div class="ticker-tag">● TODAY</div>
+    <div class="ticker-track" id="tickerTrack"></div>
+  </div>
+
+  <header class="top">
+    <div class="brand">
+      <div class="mark" id="brandMark"></div>
+      <div>
+        <h1>TODAY IN SPORTS</h1>
+        <div class="sub">MLB · NBA · NFL · MLS · NCAAF · NCAAB — SNAPSHOT BUILT FOR PHOENIX, AZ</div>
+      </div>
+    </div>
+    <div class="clockbox">
+      <div class="place">Phoenix, AZ · MST</div>
+      <div class="time" id="clockTime">--:--</div>
+      <div class="date" id="clockDate">Loading date…</div>
+    </div>
+  </header>
+
+  <div class="tabbar-wrap">
+    <div class="tabbar" id="tabbar">
+      <button class="tab-btn active" data-tab="games" id="btnGames">Games</button>
+      <button class="tab-btn" data-tab="live"><span class="dot live-pulse"></span> Live</button>
+      <button class="tab-btn" data-tab="news" id="btnNews">News</button>
+      <button class="tab-btn" data-tab="injuries" id="btnInjuries">Injuries</button>
+      <button class="tab-btn" data-tab="weather" id="btnWeather">Weather</button>
+    </div>
+  </div>
+
+  <main>
+
+    <!-- ================= GAMES TAB ================= -->
+    <section class="panel-view active" id="view-games">
+      <div class="section-title">Monday, August 10 — Today's Schedule</div>
+      <div class="section-sub">All times shown in Arizona (Phoenix / MST, no daylight saving). Only games scheduled for today are listed.</div>
+      <div class="chips" id="leagueChips"></div>
+      <div id="gamesContainer"></div>
+    </section>
+
+    <!-- ================= LIVE TAB ================= -->
+    <section class="panel-view" id="view-live">
+      <div class="section-title">Live Right Now</div>
+      <div class="section-sub">Games currently in progress across all six leagues, as of this snapshot.</div>
+      <div class="grid" id="liveContainer"></div>
+    </section>
+
+    <!-- ================= NEWS TAB ================= -->
+    <section class="panel-view" id="view-news">
+      <div class="section-title">League News</div>
+      <div class="section-sub">Top storylines making headlines today, by league. Tap a source pill to read the full story.</div>
+      <div id="newsContainer"></div>
+    </section>
+
+    <!-- ================= INJURIES TAB ================= -->
+    <section class="panel-view" id="view-injuries">
+      <div class="section-title">Injury Report</div>
+      <div class="section-sub">Notable injury and availability updates from today's reporting.</div>
+      <div id="injuriesContainer"></div>
+    </section>
+
+    <!-- ================= WEATHER TAB ================= -->
+    <section class="panel-view" id="view-weather">
+      <div class="section-title">Weather</div>
+      <div class="section-sub">Conditions at home, plus every one of today's 10 MLB host cities.</div>
+      <div class="wx-hero">
+        <div class="left">
+          <div class="icon" id="wxHeroIcon"></div>
+          <div>
+            <div class="eyebrow">Phoenix, AZ · right now</div>
+            <div class="temp">107°</div>
+            <div class="cond">Mostly sunny</div>
+          </div>
+        </div>
+        <div class="right">
+          <div class="hl">HIGH 107°</div>
+          <div class="lo">LOW 79°</div>
+          <div class="precip">20% chance of rain today</div>
+        </div>
+      </div>
+      <div class="section-title" style="font-size:19px; margin-bottom:12px;">Game-Day Conditions — All 10 MLB Host Cities</div>
+      <div class="wx-grid" id="wxGrid"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <span>Built for Phoenix (America/Phoenix, no DST) · Personal, non-commercial sports information page</span>
+    <span>Static snapshot — scores, news &amp; injury notes reflect data at time of publishing</span>
+  </footer>
+
+<script>
+/* ==================================================================
+   ICONS — original line-art SVGs (no team/league logos, IP-safe)
+================================================================== */
+const ICONS = {
+  baseball: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M7 5.5C8.7 7.6 9.6 9.7 9.6 12c0 2.3-.9 4.4-2.6 6.5M17 5.5c-1.7 2.1-2.6 4.2-2.6 6.5 0 2.3.9 4.4 2.6 6.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>`,
+  basketball: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M3 12h18M12 3v18M5.3 5.3c2.6 2.6 4.1 4.7 4.1 6.7s-1.5 4.1-4.1 6.7M18.7 5.3c-2.6 2.6-4.1 4.7-4.1 6.7s1.5 4.1 4.1 6.7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>`,
+  football: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="12" cy="12" rx="8.2" ry="5.4" transform="rotate(-40 12 12)" stroke="currentColor" stroke-width="1.6"/><path d="M8.2 8.2l7.6 7.6M9.6 9.6l1.3-1.3M11.3 11.3l1.3-1.3M13 13l1.3-1.3M14.7 14.7l1.3-1.3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`,
+  soccer: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 7.2l3.6 2.6-1.4 4.2H9.8l-1.4-4.2L12 7.2z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M12 3v4.2M4.5 8.6l3.9 1.4M6 19l3.8-4.6M18 19l-3.8-4.6M19.5 8.6l-3.9 1.4" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>`,
+  helmet: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 14c0-5 3.6-9 8-9s8 4 8 9v3.2c0 1-.8 1.8-1.8 1.8H15l-1-2h-4l-1 2H5.8C4.8 19 4 18.2 4 17.2V14z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M12 5v13M4.3 12.5h4.4M15.3 12.5h4.4" stroke="currentColor" stroke-width="1.2"/></svg>`,
+  hoop: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="12" cy="7" rx="7" ry="2.3" stroke="currentColor" stroke-width="1.5"/><path d="M5 7v1.8c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6V7M7.2 11.2L6 20M16.8 11.2L18 20M9.6 11.7l-.6 5M14.4 11.7l.6 5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`,
+  clock: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 7v5l3.2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  news: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 4h11a2 2 0 0 1 2 2v13a1 1 0 0 0 1-1V9h1" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><rect x="5" y="4" width="13" height="16" rx="1.4" stroke="currentColor" stroke-width="1.5"/><path d="M8 8h6M8 11.2h6M8 14.4h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>`,
+  cross: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="18" height="18" rx="4" stroke="currentColor" stroke-width="1.5"/><path d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`,
+  sun: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="4.6" stroke="#FFB93D" stroke-width="1.7"/><path d="M12 2.5v2.6M12 18.9v2.6M4.2 4.2l1.9 1.9M17.9 17.9l1.9 1.9M2.5 12h2.6M18.9 12h2.6M4.2 19.8l1.9-1.9M17.9 6.1l1.9-1.9" stroke="#FFB93D" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+  cloud: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 17.5A4 4 0 0 1 7.6 9.6 5.5 5.5 0 0 1 18 11a3.6 3.6 0 0 1-.6 6.5H7z" stroke="#8D98AC" stroke-width="1.6" stroke-linejoin="round"/></svg>`,
+  rain: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 14.2A4 4 0 0 1 7.6 6.3 5.5 5.5 0 0 1 18 7.7a3.6 3.6 0 0 1-.6 6.5H7z" stroke="#4FA8FF" stroke-width="1.6" stroke-linejoin="round"/><path d="M8.5 17.5L7.5 20M12.5 17.5l-1 2.5M16.5 17.5l-1 2.5" stroke="#4FA8FF" stroke-width="1.4" stroke-linecap="round"/></svg>`,
+  weather: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="9" cy="9" r="3.4" stroke="currentColor" stroke-width="1.5"/><path d="M9 3.6v1.4M9 12.8v1.4M3.6 9h1.4M12.8 9h1.4M5.6 5.6l1 1M11.4 5.6l-1 1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M12 19.5a3.6 3.6 0 0 1 .5-7.1 5 5 0 0 1 9.3 1.3 3 3 0 0 1-.6 5.8H12z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>`,
+  link: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 14a4.2 4.2 0 0 0 6 0l2.2-2.2a4.2 4.2 0 0 0-6-6L11 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M14 10a4.2 4.2 0 0 0-6 0l-2.2 2.2a4.2 4.2 0 0 0 6 6L13 17" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`,
+  calendar: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3.5" y="5" width="17" height="15" rx="2.2" stroke="currentColor" stroke-width="1.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="14" r="1.1" fill="currentColor"/><circle cx="12" cy="14" r="1.1" fill="currentColor"/><circle cx="16" cy="14" r="1.1" fill="currentColor"/></svg>`,
+};
+
+/* ==================================================================
+   VENUE ICONS — original illustrations distinguishing venue type
+   (open-air ballpark, retractable-roof dome, indoor arena,
+   gridiron stadium, soccer pitch) — not depictions of real venues.
+================================================================== */
+const VENUE_ICONS = {
+  ballpark: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 18c1.5-6.5 6-10.5 9-10.5S19.5 11.5 21 18" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M7 18a5 5 0 0 1 10 0" stroke="currentColor" stroke-width="1.2"/><path d="M4.5 8L3 5M19.5 8L21 5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><circle cx="4.5" cy="4.3" r="0.9" fill="currentColor"/><circle cx="19.5" cy="4.3" r="0.9" fill="currentColor"/><path d="M12 18v-4.5l3-2" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>`,
+  dome: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 18c1.5-6.5 6-10.5 9-10.5S19.5 11.5 21 18" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M4.2 10.2a10 10 0 0 1 15.6 0" stroke="currentColor" stroke-width="1.2" stroke-dasharray="1.6 1.6"/><path d="M7 18a5 5 0 0 1 10 0" stroke="currentColor" stroke-width="1.2"/></svg>`,
+  arena: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="5.5" width="18" height="13" rx="2.5" stroke="currentColor" stroke-width="1.4"/><circle cx="12" cy="12" r="3.1" stroke="currentColor" stroke-width="1.2"/><path d="M6 5.5v13M18 5.5v13" stroke="currentColor" stroke-width="1" stroke-dasharray="1 1.4"/></svg>`,
+  gridiron: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2.5" y="7.5" width="19" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M6 7.5v9M9.5 7.5v9M14.5 7.5v9M18 7.5v9" stroke="currentColor" stroke-width="0.9"/><path d="M2.5 12h19" stroke="currentColor" stroke-width="0.9" stroke-dasharray="0.8 1.3"/></svg>`,
+  pitch: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2.5" y="6" width="19" height="12" rx="1.5" stroke="currentColor" stroke-width="1.4"/><circle cx="12" cy="12" r="2.6" stroke="currentColor" stroke-width="1.1"/><path d="M2.5 12h3M18.5 12h3" stroke="currentColor" stroke-width="1.1"/><rect x="2.5" y="9.5" width="2.4" height="5" stroke="currentColor" stroke-width="0.9"/><rect x="19.1" y="9.5" width="2.4" height="5" stroke="currentColor" stroke-width="0.9"/></svg>`,
+};
+
+/* ==================================================================
+   LEAGUE EMBLEMS — original geometric marks referencing each sport's
+   equipment and the league's real color identity, without
+   reproducing any trademarked logo or wordmark design.
+================================================================== */
+const EMBLEMS = {
+  mlb: (c)=>`<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="20" cy="20" r="18" fill="${c}"/>
+    <circle cx="20" cy="20" r="18" fill="url(#gloss)"/>
+    <path d="M11 9C14.5 13 16.4 16.6 16.4 20c0 3.4-1.9 7-5.4 11" stroke="#fff" stroke-width="1.3" fill="none" stroke-linecap="round" opacity="0.9"/>
+    <path d="M29 9C25.5 13 23.6 16.6 23.6 20c0 3.4 1.9 7 5.4 11" stroke="#fff" stroke-width="1.3" fill="none" stroke-linecap="round" opacity="0.9"/>
+    <text x="20" y="24.5" font-family="Teko" font-size="11" font-weight="700" fill="#fff" text-anchor="middle" letter-spacing="0.5">MLB</text>
+    <defs><radialGradient id="gloss" cx="35%" cy="25%" r="70%"><stop offset="0%" stop-color="#fff" stop-opacity="0.28"/><stop offset="60%" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+  </svg>`,
+  nba: (c)=>`<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="20,2 36,11 36,29 20,38 4,29 4,11" fill="${c}"/>
+    <polygon points="20,2 36,11 36,29 20,38 4,29 4,11" fill="url(#gloss2)"/>
+    <path d="M4 20h32M20 3v34M8 7c4 4 6.3 8.4 6.3 13S12 30 8 33M32 7c-4 4-6.3 8.4-6.3 13S28 30 32 33" stroke="#fff" stroke-width="1.1" opacity="0.85"/>
+    <text x="20" y="24" font-family="Teko" font-size="9.5" font-weight="700" fill="#fff" text-anchor="middle" letter-spacing="0.5">NBA</text>
+    <defs><radialGradient id="gloss2" cx="35%" cy="20%" r="75%"><stop offset="0%" stop-color="#fff" stop-opacity="0.25"/><stop offset="60%" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+  </svg>`,
+  nfl: (c)=>`<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+    <path d="M20 2 L36 8 V21 C36 31 29 37 20 39 C11 37 4 31 4 21 V8 Z" fill="${c}"/>
+    <path d="M20 2 L36 8 V21 C36 31 29 37 20 39 C11 37 4 31 4 21 V8 Z" fill="url(#gloss3)"/>
+    <ellipse cx="20" cy="21" rx="8.5" ry="5.6" fill="none" stroke="#fff" stroke-width="1.1" opacity="0.9"/>
+    <path d="M14.2 21h11.6M17 18.3v1M17 23.7v-1M20 17.8v1M20 24.2v-1M23 18.3v1M23 23.7v-1" stroke="#fff" stroke-width="1" opacity="0.9"/>
+    <defs><radialGradient id="gloss3" cx="35%" cy="15%" r="80%"><stop offset="0%" stop-color="#fff" stop-opacity="0.25"/><stop offset="60%" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+  </svg>`,
+  mls: (c)=>`<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="20" cy="20" r="18" fill="${c}"/>
+    <circle cx="20" cy="20" r="18" fill="url(#gloss4)"/>
+    <polygon points="20,12 25,15.8 23.2,21.6 16.8,21.6 15,15.8" fill="none" stroke="#fff" stroke-width="1.2" opacity="0.9"/>
+    <path d="M20 12V8M15,15.8 11,13M25,15.8 29,13M16.8,21.6 14,28M23.2,21.6 26,28" stroke="#fff" stroke-width="1" opacity="0.85"/>
+    <defs><radialGradient id="gloss4" cx="35%" cy="20%" r="75%"><stop offset="0%" stop-color="#fff" stop-opacity="0.25"/><stop offset="60%" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+  </svg>`,
+  ncaaf: (c)=>`<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+    <path d="M5 4 H30 L36 20 L30 36 H5 Z" fill="${c}"/>
+    <path d="M5 4 H30 L36 20 L30 36 H5 Z" fill="url(#gloss5)"/>
+    <path d="M10 12c4 3 6 6 6 8s-2 5-6 8M17 10.5c4 3.6 6 6.6 6 9.5s-2 5.9-6 9.5" stroke="#fff" stroke-width="1.1" opacity="0.9" fill="none"/>
+    <defs><radialGradient id="gloss5" cx="30%" cy="20%" r="80%"><stop offset="0%" stop-color="#fff" stop-opacity="0.28"/><stop offset="60%" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+  </svg>`,
+  ncaab: (c)=>`<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+    <path d="M20 3 C29 3 36 8 36 8 V19 C36 29 29 35 20 38 C11 35 4 29 4 19 V8 C4 8 11 3 20 3 Z" fill="${c}"/>
+    <path d="M20 3 C29 3 36 8 36 8 V19 C36 29 29 35 20 38 C11 35 4 29 4 19 V8 C4 8 11 3 20 3 Z" fill="url(#gloss6)"/>
+    <ellipse cx="20" cy="15" rx="7" ry="2" fill="none" stroke="#fff" stroke-width="1.1" opacity="0.9"/>
+    <path d="M13 15v2c0 1.8 3.1 3.4 7 3.4s7-1.6 7-3.4v-2M15 20.4l-1.3 8M25 20.4l1.3 8M17.7 20.7l-0.6 6M22.3 20.7l0.6 6" stroke="#fff" stroke-width="1" opacity="0.85"/>
+    <defs><radialGradient id="gloss6" cx="35%" cy="15%" r="80%"><stop offset="0%" stop-color="#fff" stop-opacity="0.25"/><stop offset="60%" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+  </svg>`,
+};
+
+/* ==================================================================
+   DATA
+================================================================== */
+const LEAGUES = [
+  {key:'mlb', name:'MLB', color:'#FF5A5F', icon:'baseball'},
+  {key:'nba', name:'NBA', color:'#C7A2FF', icon:'basketball'},
+  {key:'nfl', name:'NFL', color:'#4FA8FF', icon:'football'},
+  {key:'mls', name:'MLS', color:'#6CACE4', icon:'soccer'},
+  {key:'ncaaf', name:'NCAAF', color:'#FFB93D', icon:'helmet'},
+  {key:'ncaab', name:'NCAAB', color:'#FF8A5C', icon:'hoop'},
+];
+
+// Real MLB team colors (public-domain color values, not logos) for badge graphics
+const TEAM_COLORS = {
+  BOS:'#BD3039', TOR:'#134A8E', NYM:'#FF5910', ATL:'#13274F', BAL:'#DF4601', MIN:'#002B5C',
+  PHI:'#E81828', STL:'#C41E3A', TEX:'#C0111F', LAA:'#BA0021', MIL:'#12284B', SD:'#2F241D',
+  TB:'#092C5C', ATH:'#003831', COL:'#33006F', AZ:'#A71930', HOU:'#EB6E1F', SF:'#FD5A1E',
+  KC:'#004687', LAD:'#005A9C'
+};
+
+// Today's real MLB schedule (Aug 10, 2026, Arizona/Phoenix time)
+const games = {
+  mlb: [
+    {status:'live', away:'BOS', awayFull:'Red Sox', home:'TOR', homeFull:'Blue Jays', scoreA:0, scoreH:0, time:'4:07 PM', venue:'Rogers Centre · Toronto', venueType:'dome'},
+    {status:'live', away:'NYM', awayFull:'Mets', home:'ATL', homeFull:'Braves', scoreA:0, scoreH:0, time:'4:15 PM', venue:'Truist Park · Atlanta', venueType:'ballpark'},
+    {status:'sched', away:'BAL', awayFull:'Orioles', home:'MIN', homeFull:'Twins', time:'4:40 PM', venue:'Target Field · Minneapolis', venueType:'ballpark'},
+    {status:'sched', away:'PHI', awayFull:'Phillies', home:'STL', homeFull:'Cardinals', time:'4:45 PM', venue:'Busch Stadium · St. Louis', venueType:'ballpark'},
+    {status:'sched', away:'TEX', awayFull:'Rangers', home:'LAA', homeFull:'Angels', time:'6:38 PM', venue:'Angel Stadium · Anaheim', venueType:'ballpark'},
+    {status:'sched', away:'MIL', awayFull:'Brewers', home:'SD', homeFull:'Padres', time:'6:40 PM', venue:'Petco Park · San Diego', venueType:'ballpark'},
+    {status:'sched', away:'TB', awayFull:'Rays', home:'ATH', homeFull:'Athletics', time:'6:40 PM', venue:'Sutter Health Park · Sacramento', venueType:'ballpark'},
+    {status:'sched', away:'COL', awayFull:'Rockies', home:'AZ', homeFull:'D-backs', time:'6:40 PM', venue:'Chase Field · Phoenix', venueType:'dome'},
+    {status:'sched', away:'HOU', awayFull:'Astros', home:'SF', homeFull:'Giants', time:'6:45 PM', venue:'Oracle Park · San Francisco', venueType:'ballpark'},
+    {status:'sched', away:'KC', awayFull:'Royals', home:'LAD', homeFull:'Dodgers', time:'7:10 PM', venue:'Dodger Stadium · Los Angeles', venueType:'ballpark'},
+  ],
+  nba: [], nfl: [], mls: [], ncaaf: [], ncaab: []
+};
+
+const offday = {
+  nba: {headline:'NBA is in the offseason', note:'The Knicks beat the Spurs to win the 2026 Finals in June. Free agency and summer league have wrapped; training camps open in late September.', nextLabel:'Season tips off', nextVal:'Late Oct 2026'},
+  nfl: {headline:'No NFL games today', note:'Training camps are underway league-wide. The Hall of Fame Game (Panthers 33, Cardinals 30) kicked off the preseason on Aug 6. Preseason Week 1 begins Thursday.', nextLabel:'Next games', nextVal:'Thu, Aug 13'},
+  mls: {headline:'No MLS matches today', note:'Clubs are between matchdays following a full slate this past weekend, including FC Cincinnati’s 4–2 win over San Jose. League play resumes this weekend.', nextLabel:'Next matchday', nextVal:'Sat, Aug 15'},
+  ncaaf: {headline:'NCAAF season hasn’t started', note:'Fall camps are in full swing across the country. Week 0 kicks off with FCS openers like Towson–Maine and Youngstown State–Mercyhurst.', nextLabel:'Season opens', nextVal:'Thu, Aug 27'},
+  ncaab: {headline:'NCAAB is in the offseason', note:'Rosters are still being finalized through the transfer portal and summer workouts. Exhibition games typically begin in late October.', nextLabel:'Season tips off', nextVal:'Early Nov 2026'},
+};
+
+const news = {
+  mlb: [
+    {h:'Mets closer Williams heads to the injured list', p:'New York placed reliever Williams on the IL with a shoulder strain, a blow to a bullpen that had steadied in recent weeks.', src:'MLB.com', url:'https://www.mlb.com/news'},
+    {h:'Batting champion Tim Anderson announces retirement', p:'The two-time All-Star and former AL batting champion is calling it a career after a decade in the majors.', src:'MLB.com', url:'https://www.mlb.com/news'},
+    {h:'Red Sox keep rolling despite a banged-up roster', p:'Boston’s historic hot streak has continued even with several regulars sidelined, a testament to its late-season depth.', src:'MLB.com', url:'https://www.mlb.com/news/mlb-series-to-watch-week-of-aug-10-2026'},
+    {h:'Phillies–Cardinals series carries real playoff weight', p:'With both clubs jockeying for postseason position, Monday’s opener in St. Louis could swing the Wild Card picture.', src:'MLB.com', url:'https://www.mlb.com/news/mlb-series-to-watch-week-of-aug-10-2026'},
+    {h:'Braves right-hander Grant Holmes riding an August surge', p:'Holmes has been Atlanta’s most reliable arm this month, outdueling Yankees ace Cam Schlittler in a 10-inning win Sunday.', src:'MLB.com', url:'https://www.mlb.com/news'},
+    {h:'Trade deadline fallout still shaping rosters', p:'Detroit’s deal sending Tarik Skubal to the Dodgers remains the talk of the league as both sides adjust to life after the swap.', src:'Sports Illustrated', url:'https://www.si.com/mlb'},
+  ],
+  nfl: [
+    {h:'Patrick Mahomes fully cleared for training camp', p:'Kansas City’s quarterback has been given the all-clear to practice without restriction following last season’s ACL injury.', src:'Football Nation', url:'https://www.footballnationusa.com/post/2026-nfl-training-camp-injury-report-updates-for-all-32-teams'},
+    {h:'Micah Parsons targeting a mid-season return', p:'The Packers edge rusher has said he expects to miss the start of the year while recovering from offseason knee procedures.', src:'Football Nation', url:'https://www.footballnationusa.com/post/2026-nfl-training-camp-injury-report-updates-for-all-32-teams'},
+    {h:'Preseason Week 1 arrives this week', p:'Eight games are on tap Thursday and Friday, including Steelers–Packers and Bengals–Lions, as rosters begin to take shape.', src:'Yahoo Sports', url:'https://sports.yahoo.com/fantasy/article/nfl-training-camp-injury-report-tracking-the-latest-news-updates-for-2026-fantasy-football-163938278.html'},
+  ],
+  mls: [
+    {h:'FC Cincinnati rally past San Jose in a 4–2 thriller', p:'Cincinnati erased two separate deficits at TQL Stadium behind a late Evander goal to extend its home win streak to three.', src:'ESPN', url:'https://www.espn.com/soccer/match/_/gameId/761700/san-jose-earthquakes-fc-cincinnati'},
+    {h:'League play pauses briefly before the weekend slate', p:'A quieter midweek gives clubs a chance to regroup before a full round of matches Saturday, headlined by Nashville hosting Inter Miami.', src:'MLS schedule', url:''},
+  ],
+  ncaaf: [
+    {h:'Fall camps open with coaching carousel storylines everywhere', p:'New hires at Virginia Tech, LSU and Michigan headline a season with unusually high turnover among marquee programs.', src:'On3', url:'https://www.on3.com/news/college-football-fall-camp-preview-hot-seats-qb-battles-title-contenders-more/'},
+  ],
+  ncaab: [
+    {h:'Rosters continue to take shape via the transfer portal', p:'Coaching staffs are finalizing depth charts ahead of the exhibition slate this fall.', src:'Offseason coverage', url:''},
+  ]
+};
+
+const injuries = {
+  mlb: [
+    {name:'Williams', team:'Mets', pos:'RP', status:'IL', detail:'Placed on the injured list with a shoulder strain.'},
+    {name:'Wood', team:'Mets', pos:'OF', status:'IL', detail:'Landed on the IL with a mild oblique strain; exited Tuesday with left-side discomfort.'},
+    {name:'Painter', team:'Phillies', pos:'SP', status:'OUT', detail:'Exited his last start early with a hamstring issue.'},
+    {name:'Ortiz', team:'Brewers', pos:'3B', status:'WATCH', detail:'Left Saturday’s game with neck tightness; awaiting MRI results.'},
+    {name:'Walker', team:'Brewers', pos:'1B', status:'WATCH', detail:'Held out of the lineup again as a precaution for right knee inflammation.'},
+    {name:'Marchán', team:'Phillies', pos:'C', status:'WATCH', detail:'Exited early with a knee issue, a day after Stubbs was placed on the IL.'},
+  ],
+  nfl: [
+    {name:'Mahomes', team:'Chiefs', pos:'QB', status:'CLEARED', detail:'Fully cleared for training camp after last season’s ACL injury.'},
+    {name:'Parsons', team:'Packers', pos:'EDGE', status:'IL', detail:'Expects to miss the start of the season recovering from ACL and meniscus procedures; targeting mid-October.'},
+    {name:'Sadiq', team:'Jets', pos:'TE', status:'OUT', detail:'Rookie tight end suffered a setback in his recovery from offseason hernia surgery and is expected to miss time.'},
+    {name:'Kittle', team:'49ers', pos:'TE', status:'WATCH', detail:'On the active/PUP list to open camp.'},
+    {name:'Sweat', team:'Cardinals', pos:'EDGE', status:'WATCH', detail:'On the active/PUP list to open camp.'},
+    {name:'Ekwonu', team:'Panthers', pos:'OT', status:'WATCH', detail:'On the active/PUP list to open camp.'},
+  ]
+};
+const injurySources = {
+  mlb: [{label:'MLB.com Injury Report', url:'https://www.mlb.com/injury-report'}, {label:'FanGraphs Roster Resource', url:'https://www.fangraphs.com/roster-resource/injury-report'}],
+  nfl: [{label:'Sharp Football Analysis', url:'https://www.sharpfootballanalysis.com/analysis/nfl-injury-report-ir-tracker/'}, {label:'Football Nation', url:'https://www.footballnationusa.com/post/2026-nfl-training-camp-injury-report-updates-for-all-32-teams'}],
+};
+
+// Weather — Phoenix plus all 10 MLB host cities today, from live conditions
+const wxCities = [
+  {city:'Toronto, ON', note:'BOS @ TOR · 4:07 PM MST', temp:77, cond:'Partly sunny', condKey:'cloud', hi:80, lo:69},
+  {city:'Atlanta, GA', note:'NYM @ ATL · 4:15 PM MST', temp:87, cond:'Light rain', condKey:'rain', hi:89, lo:71},
+  {city:'Minneapolis, MN', note:'BAL @ MIN · 4:40 PM MST', temp:83, cond:'Mostly sunny', condKey:'sun', hi:84, lo:67},
+  {city:'St. Louis, MO', note:'PHI @ STL · 4:45 PM MST', temp:88, cond:'Mostly sunny', condKey:'sun', hi:91, lo:78},
+  {city:'Anaheim, CA', note:'TEX @ LAA · 6:38 PM MST', temp:84, cond:'Sunny', condKey:'sun', hi:88, lo:69},
+  {city:'San Diego, CA', note:'MIL @ SD · 6:40 PM MST', temp:79, cond:'Mostly sunny', condKey:'sun', hi:81, lo:70},
+  {city:'Sacramento, CA', note:'TB @ ATH · 6:40 PM MST', temp:91, cond:'Sunny', condKey:'sun', hi:91, lo:61},
+  {city:'Phoenix, AZ', note:'COL @ AZ · 6:40 PM MST', temp:107, cond:'Mostly sunny — retractable roof', condKey:'sun', hi:107, lo:79},
+  {city:'San Francisco, CA', note:'HOU @ SF · 6:45 PM MST', temp:64, cond:'Sunny, cool bay breeze', condKey:'sun', hi:69, lo:57},
+  {city:'Los Angeles, CA', note:'KC @ LAD · 7:10 PM MST', temp:83, cond:'Sunny', condKey:'sun', hi:89, lo:69},
+];
+
+/* ==================================================================
+   RENDER HELPERS
+================================================================== */
+function leagueColor(key){ return LEAGUES.find(l=>l.key===key).color; }
+function leagueEmblem(key, size){
+  size = size || 38;
+  return `<div class="emblem" style="width:${size}px; height:${size}px;">${EMBLEMS[key](leagueColor(key))}</div>`;
+}
+function teamBadge(ab){
+  const c = TEAM_COLORS[ab] || '#555E6E';
+  const c2 = shade(c, -18);
+  return `<div class="badge-mono" style="background:linear-gradient(150deg, ${c}, ${c2})"><div class="sh"></div><span>${ab}</span></div>`;
+}
+function shade(hex, pct){
+  const n = parseInt(hex.slice(1),16);
+  let r = (n>>16)+Math.round(255*(pct/100)), g=((n>>8)&255)+Math.round(255*(pct/100)), b=(n&255)+Math.round(255*(pct/100));
+  r=Math.max(0,Math.min(255,r)); g=Math.max(0,Math.min(255,g)); b=Math.max(0,Math.min(255,b));
+  return `#${((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1)}`;
+}
+function wxIcon(key){ return ICONS[key] || ICONS.sun; }
+
+function gameCard(g){
+  let statusHtml, timeHtml, scoreA='', scoreH='';
+  if(g.status==='live'){
+    statusHtml = `<span class="badge live"><span class="d"></span>LIVE</span>`;
+    timeHtml = `<span class="card-time">${g.time} MST</span>`;
+    scoreA = `<span class="score">${g.scoreA}</span>`;
+    scoreH = `<span class="score">${g.scoreH}</span>`;
+  } else if(g.status==='final'){
+    statusHtml = `<span class="badge final">FINAL</span>`;
+    timeHtml = `<span class="card-time">Today</span>`;
+    scoreA = `<span class="score">${g.scoreA}</span>`;
+    scoreH = `<span class="score">${g.scoreH}</span>`;
+  } else {
+    statusHtml = `<span class="badge sched">SCHEDULED</span>`;
+    timeHtml = `<span class="card-time">${g.time} MST</span>`;
+    scoreA = `<span class="score dim">—</span>`;
+    scoreH = `<span class="score dim">—</span>`;
+  }
+  return `
+    <div class="card">
+      <div class="card-status">${statusHtml}${timeHtml}</div>
+      <div class="matchup">
+        <div class="team-row">
+          <div class="team-name">${teamBadge(g.away)}<div class="team-txt"><span class="ab">${g.away}</span><span class="full">${g.awayFull}</span></div></div>
+          ${scoreA}
+        </div>
+        <div class="team-row">
+          <div class="team-name">${teamBadge(g.home)}<div class="team-txt"><span class="ab">${g.home}</span><span class="full">${g.homeFull}</span></div></div>
+          ${scoreH}
+        </div>
+      </div>
+      <div class="card-foot"><div class="venue">${VENUE_ICONS[g.venueType||'ballpark']}<span>${g.venue}</span></div></div>
+    </div>`;
+}
+
+function offdayCard(key){
+  const o = offday[key];
+  return `
+    <div class="offday">
+      <div class="l">
+        <h3>${o.headline}</h3>
+        <p>${o.note}</p>
+      </div>
+      <div class="r">
+        <div class="lbl">${o.nextLabel}</div>
+        <div class="val">${o.nextVal}</div>
+      </div>
+    </div>`;
+}
+
+function renderGames(filter){
+  const container = document.getElementById('gamesContainer');
+  container.innerHTML = '';
+  const list = filter === 'all' ? LEAGUES.map(l=>l.key) : [filter];
+  list.forEach(key=>{
+    const l = LEAGUES.find(x=>x.key===key);
+    const list_games = games[key];
+    const section = document.createElement('div');
+    section.className = 'league-section';
+    const countLabel = list_games.length ? `${list_games.length} GAME${list_games.length>1?'S':''} TODAY` : 'OFF TODAY';
+    section.innerHTML = `
+      <div class="league-head">
+        ${leagueEmblem(key)}
+        <h2>${l.name}</h2>
+        <span class="count">${countLabel}</span>
+      </div>
+      ${ list_games.length
+          ? `<div class="grid">${list_games.map(gameCard).join('')}</div>`
+          : offdayCard(key)
+        }
+    `;
+    container.appendChild(section);
+  });
+}
+
+function renderChips(){
+  const wrap = document.getElementById('leagueChips');
+  const totalToday = Object.values(games).reduce((a,g)=>a+g.length,0);
+  let html = `<div class="chip active" data-key="all">${ICONS.calendar} All leagues <span class="n">${totalToday}</span></div>`;
+  LEAGUES.forEach(l=>{
+    html += `<div class="chip" data-key="${l.key}" style="--c:${l.color}">${leagueEmblem(l.key, 18)} ${l.name} <span class="n">${games[l.key].length}</span></div>`;
+  });
+  wrap.innerHTML = html;
+  wrap.querySelectorAll('.chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      wrap.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+      chip.classList.add('active');
+      renderGames(chip.dataset.key);
+    });
+  });
+}
+
+/* ============ LIVE TAB ============ */
+function renderLive(){
+  const wrap = document.getElementById('liveContainer');
+  let liveGames = [];
+  Object.keys(games).forEach(key=>{
+    games[key].filter(g=>g.status==='live').forEach(g=> liveGames.push(Object.assign({league:key}, g)));
+  });
+  if(!liveGames.length){
+    wrap.innerHTML = `<div class="live-empty"><div class="big">Nothing live right now</div>Check the Games tab for today's full schedule.</div>`;
+    return;
+  }
+  wrap.innerHTML = liveGames.map(g=>`
+    <div class="card">
+      <div class="card-status">
+        <span class="badge live"><span class="d"></span>LIVE</span>
+        <span class="card-time" style="color:${leagueColor(g.league)}">${g.league.toUpperCase()}</span>
+      </div>
+      <div class="matchup">
+        <div class="team-row">
+          <div class="team-name">${teamBadge(g.away)}<div class="team-txt"><span class="ab">${g.away}</span><span class="full">${g.awayFull}</span></div></div>
+          <span class="score">${g.scoreA}</span>
+        </div>
+        <div class="team-row">
+          <div class="team-name">${teamBadge(g.home)}<div class="team-txt"><span class="ab">${g.home}</span><span class="full">${g.homeFull}</span></div></div>
+          <span class="score">${g.scoreH}</span>
+        </div>
+      </div>
+      <div class="card-foot"><div class="venue">${VENUE_ICONS[g.venueType||'ballpark']}<span>${g.venue}</span></div></div>
+    </div>
+  `).join('');
+}
+
+/* ============ NEWS ============ */
+function sourcePill(src, url){
+  const inner = `${ICONS.link} ${src}`;
+  return url
+    ? `<a class="src" href="${url}" target="_blank" rel="noopener noreferrer">${inner}</a>`
+    : `<span class="src">${inner}</span>`;
+}
+function renderNews(){
+  const wrap = document.getElementById('newsContainer');
+  wrap.innerHTML = '';
+  LEAGUES.forEach(l=>{
+    const items = news[l.key];
+    if(!items || !items.length) return;
+    const block = document.createElement('div');
+    block.className = 'feed-block';
+    block.innerHTML = `
+      <div class="league-head" style="margin-top:14px;">
+        ${leagueEmblem(l.key)}
+        <h2>${l.name}</h2>
+      </div>
+      ${items.map(n=>`
+        <div class="feed-item">
+          <div class="feed-tag mono">${l.name}</div>
+          <div class="feed-body">
+            <h4>${n.h}</h4>
+            <p>${n.p}</p>
+            ${sourcePill(n.src, n.url)}
+          </div>
+        </div>`).join('')}
+    `;
+    wrap.appendChild(block);
+  });
+}
+
+/* ============ INJURIES ============ */
+function statusPillClass(s){
+  if(s==='OUT') return 'out';
+  if(s==='IL') return 'il';
+  if(s==='CLEARED') return 'clear';
+  return 'watch';
+}
+function renderInjuries(){
+  const wrap = document.getElementById('injuriesContainer');
+  wrap.innerHTML = '';
+  LEAGUES.forEach(l=>{
+    const items = injuries[l.key];
+    if(!items || !items.length) return;
+    const block = document.createElement('div');
+    block.className = 'feed-block';
+    const srcs = injurySources[l.key] || [];
+    block.innerHTML = `
+      <div class="league-head" style="margin-top:14px;">
+        ${leagueEmblem(l.key)}
+        <h2>${l.name}</h2>
+      </div>
+      ${items.map(i=>`
+        <div class="feed-item">
+          <div class="feed-tag mono">${i.pos}</div>
+          <div class="feed-body">
+            <h4>${i.name} <span style="color:var(--text-faint); font-weight:500;">· ${i.team}</span><span class="status-pill ${statusPillClass(i.status)}">${i.status}</span></h4>
+            <p>${i.detail}</p>
+          </div>
+        </div>`).join('')}
+      ${srcs.length ? `<div style="display:flex; gap:8px; flex-wrap:wrap; padding:6px 4px 16px;">${srcs.map(s=>sourcePill(s.label, s.url)).join('')}</div>` : ''}
+    `;
+    wrap.appendChild(block);
+  });
+}
+
+/* ============ WEATHER ============ */
+function renderWeather(){
+  const wrap = document.getElementById('wxGrid');
+  wrap.innerHTML = wxCities.map(w=>`
+    <div class="wx-card">
+      <div class="top-row">
+        <div>
+          <div class="city">${w.city}</div>
+          <div class="note">${w.note}</div>
+        </div>
+        <div class="icon">${wxIcon(w.condKey)}</div>
+      </div>
+      <div class="t">${w.temp}°</div>
+      <div class="c">${w.cond}</div>
+      <div class="range">H ${w.hi}° · L ${w.lo}°</div>
+    </div>
+  `).join('');
+  document.getElementById('wxHeroIcon').innerHTML = ICONS.sun;
+}
+
+/* ============ TICKER ============ */
+function renderTicker(){
+  let bits = [];
+  games.mlb.forEach(g=>{
+    if(g.status==='live'){
+      bits.push(`<span class="tag-live">● LIVE</span> ${g.away} <b>${g.scoreA}</b> @ ${g.home} <b>${g.scoreH}</b>`);
+    } else {
+      bits.push(`MLB ${g.away} @ ${g.home} — <b>${g.time} MST</b>`);
+    }
+  });
+  Object.keys(offday).forEach(key=>{
+    bits.push(`${key.toUpperCase()} — ${offday[key].nextLabel.toLowerCase()} ${offday[key].nextVal}`);
+  });
+  const html = bits.map(b=>`<span>${b}</span>`).join('<span style="color:#3a4658">/</span>');
+  document.getElementById('tickerTrack').innerHTML = html + html; // duplicate for seamless loop
+}
+
+/* ============ ICON INJECTS (header, tabs) ============ */
+document.getElementById('brandMark').innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9" stroke="#04120b" stroke-width="1.8"/><path d="M7 5.5C8.7 7.6 9.6 9.7 9.6 12c0 2.3-.9 4.4-2.6 6.5M17 5.5c-1.7 2.1-2.6 4.2-2.6 6.5 0 2.3.9 4.4 2.6 6.5" stroke="#04120b" stroke-width="1.4" stroke-linecap="round"/></svg>`;
+document.getElementById('btnGames').insertAdjacentHTML('afterbegin', ICONS.calendar);
+document.getElementById('btnNews').insertAdjacentHTML('afterbegin', ICONS.news);
+document.getElementById('btnInjuries').insertAdjacentHTML('afterbegin', ICONS.cross);
+document.getElementById('btnWeather').insertAdjacentHTML('afterbegin', ICONS.weather);
+document.querySelectorAll('#btnGames svg, #btnNews svg, #btnInjuries svg, #btnWeather svg').forEach(s=>{ s.style.width='14px'; s.style.height='14px'; });
+
+/* ============ TABS ============ */
+document.getElementById('tabbar').addEventListener('click', (e)=>{
+  const btn = e.target.closest('.tab-btn');
+  if(!btn) return;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.panel-view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-' + btn.dataset.tab).classList.add('active');
+});
+
+/* ============ CLOCK ============ */
+function updateClock(){
+  const now = new Date();
+  const opts = { timeZone:'America/Phoenix', hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:true };
+  const dateOpts = { timeZone:'America/Phoenix', weekday:'long', month:'long', day:'numeric', year:'numeric' };
+  document.getElementById('clockTime').textContent = now.toLocaleTimeString('en-US', opts);
+  document.getElementById('clockDate').textContent = now.toLocaleDateString('en-US', dateOpts);
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+/* ============ INIT ============ */
+renderChips();
+renderGames('all');
+renderLive();
+renderNews();
+renderInjuries();
+renderWeather();
+renderTicker();
+</script>
+</body>
+</html>
