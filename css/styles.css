@@ -264,10 +264,13 @@ a { color: var(--amber); }
 /* ---------------- Game cards ---------------- */
 .game-list {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 0.7rem;
 }
 
+@media (max-width: 1280px) {
+  .game-list { grid-template-columns: repeat(3, 1fr); }
+}
 @media (max-width: 980px) {
   .game-list { grid-template-columns: repeat(2, 1fr); }
 }
