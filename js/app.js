@@ -75,11 +75,7 @@
     const chip = e.target.closest(".league-chip");
     if (!chip) return;
     Store.toggleLeague(chip.dataset.league);
-    renderLeagueFilter();
-    renderGames();
-    renderLive();
-    if (activeTab === "news") { $("newsContainer").dataset.rendered = ""; renderNewsAndWeather(); }
-    if (activeTab === "injuries") { $("injuriesContainer").dataset.rendered = ""; renderInjuries(); }
+    reRenderFromFilterChange();
   });
 
   let activeTab = "games";
@@ -363,6 +359,7 @@
     const tog = e.target.closest(".settings-league-toggle");
     if (!tog) return;
     Store.toggleLeague(tog.dataset.league);
+    reRenderFromFilterChange();
     openSettings(); // re-render the modal to reflect new state
   });
   settingsLeagues.addEventListener("keydown", (e) => {
@@ -371,16 +368,37 @@
     if (!tog) return;
     e.preventDefault();
     Store.toggleLeague(tog.dataset.league);
+    reRenderFromFilterChange();
     openSettings();
   });
   settingsAllBtn.addEventListener("click", () => {
     Store.setEnabledLeagues(LEAGUES.map((l) => l.id));
+    reRenderFromFilterChange();
     openSettings();
   });
   settingsNoneBtn.addEventListener("click", () => {
     Store.setEnabledLeagues([]);
+    reRenderFromFilterChange();
     openSettings();
   });
+
+  // Re-render every panel that depends on the league filter.
+  // Used by both the chip row (visible) and the settings modal (hidden).
+  function reRenderFromFilterChange() {
+    renderLeagueFilter();
+    renderGames();
+    renderLive();
+    if (activeTab === "news") {
+      $("newsContainer").dataset.rendered = "";
+      renderNewsAndWeather();
+    }
+    if (activeTab === "injuries") {
+      $("injuriesContainer").dataset.rendered = "";
+      renderInjuries();
+    }
+    // Ticker only shows games for enabled leagues
+    Render.buildTicker(tickerTrack, lastResults.filter((r) => Store.isLeagueEnabled(r.league.id)), true);
+  }
 
   // ---------- full refresh cycle ----------
   async function refreshAll(isManual) {
