@@ -566,14 +566,26 @@
     .injury-detail { color: var(--text-faint); font-size: 12px; flex-basis: 100%; padding-left: 0; }
 
     /* ---------- weather venue cards ---------- */
-    .weather-league-card .around-body { gap: 14px; }
+    .weather-league-card .around-body { gap: 12px; padding: 12px 14px 14px; }
     .weather-venue-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 10px;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
     }
     .weather-league-card {
       grid-column: 1 / -1; /* span full width of around-grid */
+    }
+    @media (max-width: 1279px) {
+      .weather-venue-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    }
+    @media (max-width: 979px) {
+      .weather-venue-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+    @media (max-width: 720px) {
+      .weather-venue-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 440px) {
+      .weather-venue-grid { grid-template-columns: 1fr; }
     }
     .weather-venue-card {
       background: var(--panel-hi);
@@ -669,10 +681,10 @@
       background: var(--panel-hi);
       border: 1px solid var(--line);
       border-radius: 10px;
-      padding: 14px 16px;
+      padding: 10px 12px;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 4px;
       transition: transform .12s, border-color .12s, box-shadow .12s;
       position: relative;
       overflow: hidden;
@@ -696,16 +708,16 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
+      gap: 8px;
     }
     .weather-venue-card .wx-glyph {
-      font-size: 26px;
+      font-size: 22px;
       line-height: 1;
       filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
     }
     .weather-venue-card .wx-temp-lg {
       font-family: var(--font-display);
-      font-size: 32px;
+      font-size: 24px;
       font-weight: 600;
       color: var(--gold);
       letter-spacing: 0.01em;
@@ -713,26 +725,38 @@
     }
     .weather-venue-card .wx-condition {
       color: var(--text);
-      font-size: 13px;
+      font-size: 11.5px;
       font-weight: 500;
       margin-top: -2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .weather-venue-card .wx-matchup {
-      font-size: 13.5px;
+      font-size: 12.5px;
       color: var(--paper);
       font-weight: 600;
-      margin-top: 4px;
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .weather-venue-card .wx-venue {
-      font-size: 11.5px;
+      font-size: 10.5px;
       color: var(--text-faint);
       font-family: var(--font-mono);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .weather-venue-card .wx-time {
-      font-size: 11px;
+      font-size: 10.5px;
       color: var(--text-dim);
       font-family: var(--font-mono);
-      margin-top: 2px;
+      margin-top: 1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     /* temperature band tinting on the left bar */
     .weather-venue-card.band-hot::before { background: #d97706; }
@@ -888,7 +912,7 @@
     }
   </style>
   <!-- V1 content styles (game-card, weather-card, league-section, modal, news-grid) -->
-  <link rel="stylesheet" href="css/styles.css?v=7">
+  <link rel="stylesheet" href="css/styles.css?v=8">
 </head>
 <body>
 
