@@ -819,6 +819,19 @@
     .weather-venue-card.wx-snow .wx-glyph { color: #bae6fd; }
     .weather-venue-card.wx-fog .wx-glyph { color: #cbd5e1; }
     .weather-venue-card.wx-mild .wx-glyph { color: #fbbf24; }
+    /* indoor/dome: muted treatment, no weather glyph highlight */
+    .weather-venue-card.wx-indoor .wx-glyph {
+      color: var(--text-faint);
+      opacity: 0.5;
+      font-size: 26px;
+      letter-spacing: 0.05em;
+    }
+    .weather-venue-card.wx-indoor {
+      background: repeating-linear-gradient(135deg, var(--panel-hi) 0 10px, var(--panel) 10px 20px);
+      border-style: dashed;
+      border-color: var(--line);
+    }
+    .weather-venue-card.wx-indoor .wx-temp-lg { color: var(--text-faint); font-weight: 400; }
 
     /* ---------- per-league rollup stat in section header ---------- */
     .weather-league-stat {
@@ -1151,7 +1164,7 @@
   <script src="js/api.js"></script>
   <script src="js/render.js?v=9"></script>
   <!-- V2 bootstrap: wires v1's render functions into v2's chrome (header, clock, tabs, ticker, panels) -->
-  <script src="js/app.js?v=13"></script>
+  <script src="js/app.js?v=14"></script>
   
 </body>
 </html>

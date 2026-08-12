@@ -288,12 +288,20 @@
       const venues = [];
       events.forEach((ev) => {
         const w = Render.extractWeather(ev);
-        if (!w) return;
         const c = (ev.competitions && ev.competitions[0]) || {};
+        const venueName = (c.venue && c.venue.fullName) || "";
+        const venueId = (c.venue && c.venue.id) || null;
+        // Some games have no weather data yet (dome venues, far-future games,
+        // or temporary venues like Sutter Health Park that ESPN doesn't track
+        // weather for). Still show them so the venue count matches the game
+        // count — render a "no weather" placeholder with the venue + matchup.
+        const isNoWx = !w && !!venueId;
+        const wx = w || (isNoWx ? { temp: "—", detail: "No weather data", glyph: "—", cls: "wx-indoor" } : null);
+        if (!w && !isNoWx) return; // skip events with neither weather nor venue
         const v = {
-          wx: w,
+          wx,
           matchup: ev.shortName || ev.name || "",
-          venue: (c.venue && c.venue.fullName) || "",
+          venue: venueName,
           startTime: ev.date || "",
           eventId: ev.id,
         };
@@ -316,19 +324,23 @@
       return;
     }
     // Site-wide summary
-    const temps = allVenues.map((v) => parseInt(String(v.wx.temp).replace(/[^\d-]/g, ""), 10)).filter((n) => !Number.isNaN(n));
+    const outdoorVenues = allVenues.filter((v) => v.wx.cls !== "wx-indoor");
+    const indoorCount = allVenues.length - outdoorVenues.length;
+    const temps = outdoorVenues.map((v) => parseInt(String(v.wx.temp).replace(/[^\d-]/g, ""), 10)).filter((n) => !Number.isNaN(n));
     const avgTemp = temps.length ? Math.round(temps.reduce((a, b) => a + b, 0) / temps.length) : null;
     const maxTemp = temps.length ? Math.max.apply(null, temps) : null;
     const minTemp = temps.length ? Math.min.apply(null, temps) : null;
     const conditionCounts = {};
-    allVenues.forEach((v) => {
+    outdoorVenues.forEach((v) => {
       const key = String(v.wx.detail || "Unknown").replace(/\s*gusts.*$/i, "").trim();
       conditionCounts[key] = (conditionCounts[key] || 0) + 1;
     });
     const topCondition = Object.entries(conditionCounts).sort((a, b) => b[1] - a[1])[0];
+    const venueLabel = outdoorVenues.length === 1 ? "Outdoor Venue" : "Outdoor Venues";
     const summaryHtml =
       '<div class="weather-summary">' +
-        '<div class="ws-stat"><span class="ws-num">' + allVenues.length + '</span><span class="ws-label">Outdoor Venues</span></div>' +
+        '<div class="ws-stat"><span class="ws-num">' + outdoorVenues.length + '</span><span class="ws-label">' + venueLabel + '</span></div>' +
+        (indoorCount ? '<div class="ws-sep"></div><div class="ws-stat"><span class="ws-num">' + indoorCount + '</span><span class="ws-label">No wx</span></div>' : '') +
         '<div class="ws-sep"></div>' +
         (avgTemp !== null ? '<div class="ws-stat"><span class="ws-num">' + avgTemp + '°F</span><span class="ws-label">Avg Temp</span></div><div class="ws-sep"></div>' : '') +
         (maxTemp !== null ? '<div class="ws-stat"><span class="ws-num">' + maxTemp + '°F</span><span class="ws-label">High</span></div><div class="ws-sep"></div>' : '') +
@@ -340,14 +352,19 @@
     grid.className = "around-grid";
     sections.forEach(({ league, venues }) => {
       const logo = league.logo ? '<img src="' + escapeHtml(league.logo) + '" alt="" loading="lazy" onerror="this.style.display=\'none\'">' : "";
-      const lTemps = venues.map((v) => parseInt(String(v.wx.temp).replace(/[^\d-]/g, ""), 10)).filter((n) => !Number.isNaN(n));
-      const lAvg = lTemps.length ? Math.round(lTemps.reduce((a, b) => a + b, 0) / lTemps.length) : null;
-      const leagueStat = lAvg !== null ? '<span class="weather-league-avg">' + lAvg + '°F avg · ' + venues.length + ' venue' + (venues.length === 1 ? "" : "s") + '</span>' : "";
+      const lOutdoor = venues.filter((v) => v.wx.cls !== "wx-indoor");
+      const lTemps = lOutdoor.map((v) => parseInt(String(v.wx.temp).replace(/[^\d-]/g, ""), 10)).filter((n) => !Number.isNaN(n));
+      const lAvg = lOutdoor.length ? Math.round(lTemps.reduce((a, b) => a + b, 0) / lOutdoor.length) : null;
+      const leagueStat = lAvg !== null
+        ? '<span class="weather-league-avg">' + lAvg + '°F avg · ' + venues.length + ' game' + (venues.length === 1 ? "" : "s") + '</span>'
+        : '<span class="weather-league-avg">' + venues.length + ' game' + (venues.length === 1 ? "" : "s") + '</span>';
       const venueCards = venues.map((v) => {
-        const icon = wxIcon(v.wx.detail);
+        const isNoWx = v.wx.cls === "wx-indoor";
+        const icon = isNoWx ? { glyph: "—", cls: "wx-indoor" } : wxIcon(v.wx.detail);
+        const band = isNoWx ? "" : "band-" + bandFromTemp(v.wx.temp);
         const time = v.startTime ? new Date(v.startTime).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true }) : "";
         const dateStr = v.startTime ? new Date(v.startTime).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" }) : "";
-        return '<div class="weather-venue-card band-' + bandFromTemp(v.wx.temp) + ' ' + icon.cls + '">' +
+        return '<div class="weather-venue-card ' + band + ' ' + icon.cls + '">' +
           '<div class="wx-row-top">' +
             '<span class="wx-glyph">' + icon.glyph + '</span>' +
             '<span class="wx-temp-lg">' + escapeHtml(v.wx.temp || "—") + '</span>' +
