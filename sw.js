@@ -10,9 +10,9 @@
  * Install: Automatically registered by browser if served over HTTPS (or localhost)
  */
 
-const CACHE_NAME = 'oddsify-intel-v10';
-const STATIC_CACHE = 'oddsify-static-v10';
-const API_CACHE = 'oddsify-api-v10';
+const CACHE_NAME = 'oddsify-intel-v11';
+const STATIC_CACHE = 'oddsify-static-v11';
+const API_CACHE = 'oddsify-api-v11';
 
 // Static assets to cache immediately
 const STATIC_ASSETS = [

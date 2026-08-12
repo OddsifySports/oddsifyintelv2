@@ -26,6 +26,7 @@
 
   const tabsEl = $("tabbar");
   const tickerTrack = $("tickerTrack");
+  const tickerWrap = tickerTrack ? tickerTrack.closest(".ticker-wrap") : null;
   const statusDot = $("statusDot");
   const statusText = $("statusText");
   const lastUpdatedEl = $("lastUpdated");
@@ -43,6 +44,8 @@
   const settingsLeagues = $("settings-leagues");
   const settingsAllBtn = $("settings-all");
   const settingsNoneBtn = $("settings-none");
+  const settingsTickerEl = $("settings-ticker");
+  const tickerWrapRef = tickerWrap;
 
   function updateClock() {
     const s = Store.getSettings();
@@ -56,6 +59,35 @@
   }
   updateClock();
   setInterval(updateClock, 1000);
+
+  // ---------- ticker speed ----------
+  // Maps user-facing speed label → CSS animation duration. "off" freezes
+  // the marquee entirely (no animation, no duplicate items needed).
+  const TICKER_DURATIONS = {
+    verySlow: "120s",
+    slow: "75s",
+    normal: "45s",
+    fast: "20s",
+  };
+  const TICKER_LABELS = {
+    verySlow: { title: "Very Slow", hint: "120s loop" },
+    slow:      { title: "Slow",     hint: "75s loop" },
+    normal:    { title: "Normal",   hint: "45s loop" },
+    fast:      { title: "Fast",     hint: "20s loop" },
+    off:       { title: "Off",      hint: "no scroll" },
+  };
+  function applyTickerSpeed() {
+    const speed = Store.getSettings().tickerSpeed || "normal";
+    if (!tickerWrapRef) return;
+    if (speed === "off") {
+      tickerWrapRef.classList.add("ticker-static");
+      tickerWrapRef.style.removeProperty("--ticker-duration");
+    } else {
+      tickerWrapRef.classList.remove("ticker-static");
+      tickerWrapRef.style.setProperty("--ticker-duration", TICKER_DURATIONS[speed] || TICKER_DURATIONS.normal);
+    }
+  }
+  applyTickerSpeed();
 
   function enabledLeagues() {
     const s = Store.getSettings();
@@ -209,7 +241,29 @@
     container.dataset.rendered = "1";
   }
 
-  // ---------- Weather (one card per outdoor venue today) ----------
+  // ---------- Weather (UX-enhanced venue cards with site-wide summary) ----------
+  // Maps ESPN conditionId keywords → unicode glyph + CSS class for tinting.
+  function wxIcon(conditionId) {
+    const s = String(conditionId || "").toLowerCase();
+    if (s.includes("clear") || s.includes("sunny")) return { glyph: "☀️", cls: "wx-clear" };
+    if (s.includes("partly")) return { glyph: "⛅", cls: "wx-partly" };
+    if (s.includes("cloud") && s.includes("most")) return { glyph: "☁️", cls: "wx-mostly" };
+    if (s.includes("cloud")) return { glyph: "☁️", cls: "wx-cloud" };
+    if (s.includes("rain") || s.includes("shower")) return { glyph: "🌧️", cls: "wx-rain" };
+    if (s.includes("thunder") || s.includes("storm")) return { glyph: "⛈️", cls: "wx-storm" };
+    if (s.includes("snow") || s.includes("flurr")) return { glyph: "🌨️", cls: "wx-snow" };
+    if (s.includes("fog") || s.includes("haze") || s.includes("mist")) return { glyph: "🌫️", cls: "wx-fog" };
+    if (s.includes("wind")) return { glyph: "💨", cls: "wx-wind" };
+    return { glyph: "🌤️", cls: "wx-mild" };
+  }
+  function bandFromTemp(tempStr) {
+    const n = parseInt(String(tempStr).replace(/[^\d-]/g, ""), 10);
+    if (Number.isNaN(n)) return "mild";
+    if (n >= 85) return "hot";
+    if (n >= 70) return "mild";
+    return "cool";
+  }
+
   function renderWeather() {
     const container = $("weatherContainer");
     if (!container) return;
@@ -221,6 +275,7 @@
       return;
     }
     const sections = [];
+    const allVenues = [];
     filtered.forEach((league) => {
       const result = lastResults.find((r) => r.league.id === league.id);
       if (!result) return;
@@ -230,44 +285,85 @@
         const w = Render.extractWeather(ev);
         if (!w) return;
         const c = (ev.competitions && ev.competitions[0]) || {};
-        venues.push({
+        const v = {
           wx: w,
           matchup: ev.shortName || ev.name || "",
           venue: (c.venue && c.venue.fullName) || "",
           startTime: ev.date || "",
-        });
+          eventId: ev.id,
+        };
+        venues.push(v);
+        allVenues.push(v);
       });
-      if (venues.length) sections.push({ league, venues });
+      if (venues.length) {
+        venues.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
+        sections.push({ league, venues });
+      }
     });
     if (!sections.length) {
-      container.innerHTML = '<div class="empty-note">No outdoor venues with weather data today.</div>';
+      container.innerHTML =
+        '<div class="weather-empty-hero">' +
+          '<div class="weather-empty-glyph">☁️</div>' +
+          '<div class="big">No outdoor games with weather data today</div>' +
+          '<p>Today\'s slate is all dome / indoor games. Check back tomorrow — outdoor sports return when the leagues restart outdoor play.</p>' +
+        '</div>';
       container.dataset.rendered = "1";
       return;
     }
+    // Site-wide summary
+    const temps = allVenues.map((v) => parseInt(String(v.wx.temp).replace(/[^\d-]/g, ""), 10)).filter((n) => !Number.isNaN(n));
+    const avgTemp = temps.length ? Math.round(temps.reduce((a, b) => a + b, 0) / temps.length) : null;
+    const maxTemp = temps.length ? Math.max.apply(null, temps) : null;
+    const minTemp = temps.length ? Math.min.apply(null, temps) : null;
+    const conditionCounts = {};
+    allVenues.forEach((v) => {
+      const key = String(v.wx.detail || "Unknown").replace(/\s*gusts.*$/i, "").trim();
+      conditionCounts[key] = (conditionCounts[key] || 0) + 1;
+    });
+    const topCondition = Object.entries(conditionCounts).sort((a, b) => b[1] - a[1])[0];
+    const summaryHtml =
+      '<div class="weather-summary">' +
+        '<div class="ws-stat"><span class="ws-num">' + allVenues.length + '</span><span class="ws-label">Outdoor Venues</span></div>' +
+        '<div class="ws-sep"></div>' +
+        (avgTemp !== null ? '<div class="ws-stat"><span class="ws-num">' + avgTemp + '°F</span><span class="ws-label">Avg Temp</span></div><div class="ws-sep"></div>' : '') +
+        (maxTemp !== null ? '<div class="ws-stat"><span class="ws-num">' + maxTemp + '°F</span><span class="ws-label">High</span></div><div class="ws-sep"></div>' : '') +
+        (minTemp !== null ? '<div class="ws-stat"><span class="ws-num">' + minTemp + '°F</span><span class="ws-label">Low</span></div><div class="ws-sep"></div>' : '') +
+        (topCondition ? '<div class="ws-stat"><span class="ws-num wx-cond">' + wxIcon(topCondition[0]).glyph + '</span><span class="ws-label">' + escapeHtml(topCondition[0]) + '</span></div>' : '') +
+      '</div>';
+
     const grid = document.createElement("div");
     grid.className = "around-grid";
     sections.forEach(({ league, venues }) => {
       const logo = league.logo ? '<img src="' + escapeHtml(league.logo) + '" alt="" loading="lazy" onerror="this.style.display=\'none\'">' : "";
+      const lTemps = venues.map((v) => parseInt(String(v.wx.temp).replace(/[^\d-]/g, ""), 10)).filter((n) => !Number.isNaN(n));
+      const lAvg = lTemps.length ? Math.round(lTemps.reduce((a, b) => a + b, 0) / lTemps.length) : null;
+      const leagueStat = lAvg !== null ? '<span class="weather-league-avg">' + lAvg + '°F avg · ' + venues.length + ' venue' + (venues.length === 1 ? "" : "s") + '</span>' : "";
       const venueCards = venues.map((v) => {
+        const icon = wxIcon(v.wx.detail);
         const time = v.startTime ? new Date(v.startTime).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true }) : "";
-        return '<div class="weather-venue-card">' +
-          '<div class="wx-temp-lg">' + escapeHtml(v.wx.temp || "—") + '</div>' +
-          '<div class="wx-detail">' + escapeHtml(v.wx.detail || "conditions at kickoff") + '</div>' +
+        const dateStr = v.startTime ? new Date(v.startTime).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" }) : "";
+        return '<div class="weather-venue-card band-' + bandFromTemp(v.wx.temp) + ' ' + icon.cls + '">' +
+          '<div class="wx-row-top">' +
+            '<span class="wx-glyph">' + icon.glyph + '</span>' +
+            '<span class="wx-temp-lg">' + escapeHtml(v.wx.temp || "—") + '</span>' +
+          '</div>' +
+          '<div class="wx-condition">' + escapeHtml(v.wx.detail || "conditions at kickoff") + '</div>' +
           '<div class="wx-matchup">' + escapeHtml(v.matchup) + '</div>' +
-          (v.venue ? '<div class="wx-venue">' + escapeHtml(v.venue) + '</div>' : '') +
-          (time ? '<div class="wx-time">' + escapeHtml(time) + '</div>' : '') +
+          (v.venue ? '<div class="wx-venue">📍 ' + escapeHtml(v.venue) + '</div>' : "") +
+          (time ? '<div class="wx-time"><span class="wx-time-icon">🕐</span> ' + escapeHtml(time) + (dateStr ? " · " + escapeHtml(dateStr) : "") + '</div>' : "") +
         '</div>';
       }).join("");
       grid.insertAdjacentHTML("beforeend",
         '<div class="around-card weather-league-card">' +
           '<div class="around-head">' +
             '<span class="league-id">' + logo + '<span>' + escapeHtml(league.label) + '</span></span>' +
-            '<span class="weather-pill"><span class="wx-temp">' + escapeHtml(venues[0].wx.temp) + '</span></span>' +
+            '<span class="weather-league-stat">' + leagueStat + '</span>' +
           '</div>' +
           '<div class="around-body weather-venue-grid">' + venueCards + '</div>' +
         '</div>');
     });
     container.innerHTML = "";
+    container.insertAdjacentHTML("beforeend", summaryHtml);
     container.appendChild(grid);
     container.dataset.rendered = "1";
   }
@@ -381,6 +477,15 @@
       const logo = l.logo ? '<img class="settings-league-logo" src="' + escapeHtml(l.logo) + '" alt="" loading="lazy" onerror="this.style.display=\'none\'">' : "";
       return '<div role="button" tabindex="0" class="settings-league-toggle ' + (isOn ? "on" : "") + '" data-league="' + escapeHtml(l.id) + '" aria-pressed="' + isOn + '">' + logo + '<span>' + escapeHtml(l.label) + '</span></div>';
     }).join("");
+    // Render ticker-speed radios
+    settingsTickerEl.innerHTML = Store.TICKER_SPEEDS.map((sp) => {
+      const isOn = (s.tickerSpeed || "normal") === sp;
+      const meta = TICKER_LABELS[sp];
+      return '<button type="button" role="radio" class="settings-ticker-option ' + (isOn ? "on" : "") + '" data-speed="' + sp + '" aria-checked="' + isOn + '" tabindex="' + (isOn ? "0" : "-1") + '">' +
+        '<span class="speed-title">' + escapeHtml(meta.title) + '</span>' +
+        '<span class="speed-hint">' + escapeHtml(meta.hint) + '</span>' +
+      '</button>';
+    }).join("");
     settingsOverlay.hidden = false;
     document.body.style.overflow = "hidden";
   }
@@ -403,6 +508,20 @@
   settingsLocation.addEventListener("input", () => {
     Store.setSetting("location", settingsLocation.value);
     updateClock();
+  });
+  settingsTickerEl.addEventListener("click", (e) => {
+    const btn = e.target.closest(".settings-ticker-option");
+    if (!btn) return;
+    const speed = btn.dataset.speed;
+    Store.setSetting("tickerSpeed", speed);
+    applyTickerSpeed();
+    // Update only the radio button states in-place (don't re-render whole modal)
+    Array.from(settingsTickerEl.children).forEach((c) => {
+      const isOn = c.dataset.speed === speed;
+      c.classList.toggle("on", isOn);
+      c.setAttribute("aria-checked", String(isOn));
+      c.setAttribute("tabindex", isOn ? "0" : "-1");
+    });
   });
   settingsLeagues.addEventListener("click", (e) => {
     const tog = e.target.closest(".settings-league-toggle");

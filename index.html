@@ -344,6 +344,49 @@
       color: var(--text);
     }
     .settings-league-actions { color: var(--text-faint); font-size: 12px; }
+
+    /* ---------- ticker-speed radio chips ---------- */
+    .settings-ticker {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 4px;
+    }
+    .settings-ticker-option {
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      font-family: var(--font-display);
+      font-size: 12.5px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 8px 4px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background .12s, color .12s;
+      text-align: center;
+    }
+    .settings-ticker-option:hover { color: var(--text); }
+    .settings-ticker-option.on {
+      background: var(--gold-dim);
+      color: var(--ink);
+    }
+    .settings-ticker-option .speed-hint {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 400;
+      letter-spacing: 0;
+      text-transform: none;
+      margin-top: 2px;
+      opacity: 0.7;
+    }
+    @media (max-width: 540px) {
+      .settings-ticker { grid-template-columns: repeat(3, 1fr); }
+    }
     .settings-link {
       background: none; border: none; padding: 0;
       color: var(--text-faint);
@@ -556,6 +599,178 @@
       font-family: var(--font-mono);
       margin-top: 2px;
     }
+    .weather-venue-card .wx-time-icon { opacity: 0.7; }
+
+    /* ---------- weather hero summary ---------- */
+    .weather-summary {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      padding: 14px 20px;
+      margin-bottom: 18px;
+      background: linear-gradient(135deg, var(--panel) 0%, var(--panel-hi) 100%);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      flex-wrap: wrap;
+    }
+    .ws-stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 18px;
+      min-width: 90px;
+    }
+    .ws-stat .ws-num {
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--gold);
+      letter-spacing: 0.02em;
+      line-height: 1;
+    }
+    .ws-stat .ws-num.wx-cond { font-size: 26px; }
+    .ws-stat .ws-label {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-faint);
+      margin-top: 6px;
+    }
+    .ws-sep {
+      width: 1px;
+      background: var(--line);
+      align-self: stretch;
+      margin: 0 4px;
+    }
+    @media (max-width: 700px) {
+      .weather-summary { padding: 12px 8px; }
+      .ws-stat { padding: 4px 10px; min-width: 70px; }
+      .ws-stat .ws-num { font-size: 22px; }
+    }
+
+    /* ---------- enhanced venue cards ---------- */
+    .weather-venue-card {
+      background: var(--panel-hi);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: transform .12s, border-color .12s, box-shadow .12s;
+      position: relative;
+      overflow: hidden;
+    }
+    .weather-venue-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; bottom: 0;
+      width: 4px;
+      background: var(--gold-dim);
+      opacity: 0;
+      transition: opacity .12s;
+    }
+    .weather-venue-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--gold-dim);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
+    .weather-venue-card:hover::before { opacity: 1; }
+    .weather-venue-card .wx-row-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .weather-venue-card .wx-glyph {
+      font-size: 26px;
+      line-height: 1;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
+    }
+    .weather-venue-card .wx-temp-lg {
+      font-family: var(--font-display);
+      font-size: 32px;
+      font-weight: 600;
+      color: var(--gold);
+      letter-spacing: 0.01em;
+      line-height: 1;
+    }
+    .weather-venue-card .wx-condition {
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 500;
+      margin-top: -2px;
+    }
+    .weather-venue-card .wx-matchup {
+      font-size: 13.5px;
+      color: var(--paper);
+      font-weight: 600;
+      margin-top: 4px;
+    }
+    .weather-venue-card .wx-venue {
+      font-size: 11.5px;
+      color: var(--text-faint);
+      font-family: var(--font-mono);
+    }
+    .weather-venue-card .wx-time {
+      font-size: 11px;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+      margin-top: 2px;
+    }
+    /* temperature band tinting on the left bar */
+    .weather-venue-card.band-hot::before { background: #d97706; }
+    .weather-venue-card.band-cool::before { background: #0ea5e9; }
+    .weather-venue-card.band-mild::before { background: var(--gold-dim); }
+    /* condition glyph colors */
+    .weather-venue-card.wx-clear .wx-glyph { color: #fbbf24; }
+    .weather-venue-card.wx-partly .wx-glyph { color: #fbbf24; }
+    .weather-venue-card.wx-mostly .wx-glyph,
+    .weather-venue-card.wx-cloud .wx-glyph { color: #94a3b8; }
+    .weather-venue-card.wx-rain .wx-glyph,
+    .weather-venue-card.wx-storm .wx-glyph { color: #60a5fa; }
+    .weather-venue-card.wx-snow .wx-glyph { color: #bae6fd; }
+    .weather-venue-card.wx-fog .wx-glyph { color: #cbd5e1; }
+    .weather-venue-card.wx-mild .wx-glyph { color: #fbbf24; }
+
+    /* ---------- per-league rollup stat in section header ---------- */
+    .weather-league-stat {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--text-dim);
+      letter-spacing: 0.02em;
+    }
+    .weather-league-avg { color: var(--gold); }
+
+    /* ---------- empty hero state for weather page ---------- */
+    .weather-empty-hero {
+      max-width: 540px;
+      margin: 40px auto;
+      padding: 40px 28px;
+      text-align: center;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+    }
+    .weather-empty-glyph {
+      font-size: 56px;
+      margin-bottom: 12px;
+      opacity: 0.7;
+    }
+    .weather-empty-hero .big {
+      font-family: var(--font-display);
+      font-size: 22px;
+      letter-spacing: 0.04em;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+    .weather-empty-hero p {
+      color: var(--text-faint);
+      font-size: 13.5px;
+      line-height: 1.55;
+    }
   </style>
   <!-- V1 content styles (game-card, weather-card, league-section, modal, news-grid) -->
   <link rel="stylesheet" href="css/styles.css?v=7">
@@ -684,6 +899,12 @@
         </div>
       </section>
 
+      <section class="settings-section">
+        <label class="settings-label">News ticker speed</label>
+        <p class="settings-help">How fast the top-of-page ticker scrolls through scores and live odds. Hover the ticker to pause.</p>
+        <div id="settings-ticker" class="settings-ticker" role="radiogroup" aria-label="Ticker speed"></div>
+      </section>
+
       <div class="settings-footer">
         <button id="settings-done" class="settings-done-btn" type="button">Done</button>
       </div>
@@ -692,11 +913,11 @@
 
 <!-- V1 data layer (config, storage, api, render) — provides LEAGUES, Api, Render, Store -->
   <script src="js/config.js"></script>
-  <script src="js/storage.js"></script>
+  <script src="js/storage.js?v=11"></script>
   <script src="js/api.js"></script>
   <script src="js/render.js?v=9"></script>
   <!-- V2 bootstrap: wires v1's render functions into v2's chrome (header, clock, tabs, ticker, panels) -->
-  <script src="js/app.js?v=10"></script>
+  <script src="js/app.js?v=12"></script>
   
 </body>
 </html>

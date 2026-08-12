@@ -125,6 +125,9 @@ const Store = (() => {
 
   /* ---------------- settings ---------------- */
   const SETTINGS_KEY = "oi:settings";
+  // Ticker speed modes. durations are matched 1:1 in app.js → CSS var.
+  // "off" freezes the marquee (items are rendered once, no animation).
+  const TICKER_SPEEDS = ["verySlow", "slow", "normal", "fast", "off"];
   const DEFAULT_SETTINGS = {
     tickerEnabled: true,
     tickerSpeed: "normal",
@@ -201,5 +204,6 @@ const Store = (() => {
     setEnabledLeagues,
     toggleLeague,
     COMMON_TIMEZONES,
+    TICKER_SPEEDS,
   };
 })();
