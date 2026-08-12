@@ -558,8 +558,11 @@
     .weather-league-card .around-body { gap: 14px; }
     .weather-venue-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 12px;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 10px;
+    }
+    .weather-league-card {
+      grid-column: 1 / -1; /* span full width of around-grid */
     }
     .weather-venue-card {
       background: var(--panel-hi);
