@@ -83,7 +83,8 @@
     activeTab = id;
     document.querySelectorAll(".tab-btn").forEach((b) => b.classList.toggle("active", b.dataset.tab === id));
     document.querySelectorAll(".panel-view").forEach((p) => p.classList.toggle("active", p.id === "view-" + id));
-    if (id === "news" && !$("newsContainer").dataset.rendered) renderNewsAndWeather();
+    if (id === "news" && !$("newsContainer").dataset.rendered) renderNews();
+    if (id === "weather" && !$("weatherContainer").dataset.rendered) renderWeather();
     if (id === "injuries" && !$("injuriesContainer").dataset.rendered) renderInjuries();
   }
   tabsEl.addEventListener("click", (e) => {
@@ -162,11 +163,11 @@
     });
   }
 
-  // ---------- News + Weather combined ("Around the Leagues") ----------
-  async function renderNewsAndWeather() {
+  // ---------- News (Around the Leagues cards, headlines only) ----------
+  async function renderNews() {
     const container = $("newsContainer");
     if (!container) return;
-    container.innerHTML = '<div class="empty-note">Loading headlines and venue weather…</div>';
+    container.innerHTML = '<div class="empty-note">Loading headlines…</div>';
     const filtered = enabledLeagues();
     if (!filtered.length) {
       container.innerHTML = '<div class="empty-note">All leagues disabled — open Settings to enable some.</div>';
@@ -178,25 +179,11 @@
       if (!newsCache.has(league.id)) newsCache.set(league.id, await Api.getNews(league));
       newsByLeague[league.id] = newsCache.get(league.id);
     }));
-    const wxByLeague = {};
-    lastResults.forEach(({ league, scoreboardData }) => {
-      const events = (scoreboardData && scoreboardData.events) || [];
-      const wx = [];
-      events.forEach((ev) => {
-        const w = Render.extractWeather(ev);
-        if (w) wx.push(w);
-      });
-      wxByLeague[league.id] = wx.length ? wx[0] : null;
-    });
     const grid = document.createElement("div");
     grid.className = "around-grid";
     filtered.forEach((league) => {
-      const wx = wxByLeague[league.id];
       const newsRes = newsByLeague[league.id] || { ok: false };
       const newsItems = newsRes.ok && Array.isArray(newsRes.data.articles) ? newsRes.data.articles.slice(0, 5) : [];
-      const wxPill = wx
-        ? '<span class="weather-pill"><span class="wx-temp">' + escapeHtml(wx.temp || "") + '</span>' + (wx.detail ? ' <span>·</span> <span>' + escapeHtml(wx.detail) + '</span>' : '') + '</span>'
-        : '<span class="weather-pill none">dome / no wx</span>';
       const itemsHtml = newsItems.length
         ? newsItems.map((a) => {
             const url = (a.links && a.links.api && a.links.api.href) || (a.links && a.links.web && a.links.web.href) || "#";
@@ -213,9 +200,71 @@
         '<div class="around-card">' +
           '<div class="around-head">' +
             '<span class="league-id">' + logo + '<span>' + escapeHtml(league.label) + '</span></span>' +
-            wxPill +
           '</div>' +
           '<div class="around-body">' + itemsHtml + '</div>' +
+        '</div>');
+    });
+    container.innerHTML = "";
+    container.appendChild(grid);
+    container.dataset.rendered = "1";
+  }
+
+  // ---------- Weather (one card per outdoor venue today) ----------
+  function renderWeather() {
+    const container = $("weatherContainer");
+    if (!container) return;
+    container.innerHTML = '<div class="empty-note">Loading venue weather…</div>';
+    const filtered = enabledLeagues();
+    if (!filtered.length) {
+      container.innerHTML = '<div class="empty-note">All leagues disabled — open Settings to enable some.</div>';
+      container.dataset.rendered = "1";
+      return;
+    }
+    const sections = [];
+    filtered.forEach((league) => {
+      const result = lastResults.find((r) => r.league.id === league.id);
+      if (!result) return;
+      const events = (result.scoreboardData && result.scoreboardData.events) || [];
+      const venues = [];
+      events.forEach((ev) => {
+        const w = Render.extractWeather(ev);
+        if (!w) return;
+        const c = (ev.competitions && ev.competitions[0]) || {};
+        venues.push({
+          wx: w,
+          matchup: ev.shortName || ev.name || "",
+          venue: (c.venue && c.venue.fullName) || "",
+          startTime: ev.date || "",
+        });
+      });
+      if (venues.length) sections.push({ league, venues });
+    });
+    if (!sections.length) {
+      container.innerHTML = '<div class="empty-note">No outdoor venues with weather data today.</div>';
+      container.dataset.rendered = "1";
+      return;
+    }
+    const grid = document.createElement("div");
+    grid.className = "around-grid";
+    sections.forEach(({ league, venues }) => {
+      const logo = league.logo ? '<img src="' + escapeHtml(league.logo) + '" alt="" loading="lazy" onerror="this.style.display=\'none\'">' : "";
+      const venueCards = venues.map((v) => {
+        const time = v.startTime ? new Date(v.startTime).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true }) : "";
+        return '<div class="weather-venue-card">' +
+          '<div class="wx-temp-lg">' + escapeHtml(v.wx.temp || "—") + '</div>' +
+          '<div class="wx-detail">' + escapeHtml(v.wx.detail || "conditions at kickoff") + '</div>' +
+          '<div class="wx-matchup">' + escapeHtml(v.matchup) + '</div>' +
+          (v.venue ? '<div class="wx-venue">' + escapeHtml(v.venue) + '</div>' : '') +
+          (time ? '<div class="wx-time">' + escapeHtml(time) + '</div>' : '') +
+        '</div>';
+      }).join("");
+      grid.insertAdjacentHTML("beforeend",
+        '<div class="around-card weather-league-card">' +
+          '<div class="around-head">' +
+            '<span class="league-id">' + logo + '<span>' + escapeHtml(league.label) + '</span></span>' +
+            '<span class="weather-pill"><span class="wx-temp">' + escapeHtml(venues[0].wx.temp) + '</span></span>' +
+          '</div>' +
+          '<div class="around-body weather-venue-grid">' + venueCards + '</div>' +
         '</div>');
     });
     container.innerHTML = "";
@@ -390,7 +439,11 @@
     renderLive();
     if (activeTab === "news") {
       $("newsContainer").dataset.rendered = "";
-      renderNewsAndWeather();
+      renderNews();
+    }
+    if (activeTab === "weather") {
+      $("weatherContainer").dataset.rendered = "";
+      renderWeather();
     }
     if (activeTab === "injuries") {
       $("injuriesContainer").dataset.rendered = "";
@@ -410,7 +463,8 @@
       Render.buildTicker(tickerTrack, enabledLeagues().map((league) => lastResults.find((r) => r.league.id === league.id)).filter(Boolean), true);
       renderGames();
       renderLive();
-      if (activeTab === "news") { $("newsContainer").dataset.rendered = ""; renderNewsAndWeather(); }
+      if (activeTab === "news") { $("newsContainer").dataset.rendered = ""; renderNews(); }
+      if (activeTab === "weather") { $("weatherContainer").dataset.rendered = ""; renderWeather(); }
       if (activeTab === "injuries") { $("injuriesContainer").dataset.rendered = ""; renderInjuries(); }
 
       const filtered = enabledLeagues();
