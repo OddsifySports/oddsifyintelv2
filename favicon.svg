@@ -1,10 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
-  <!-- Oddsify Intel logo: dark rounded square with gold diamond + teal pupil -->
-  <!-- Background plate -->
-  <rect x="2" y="2" width="60" height="60" rx="13" fill="#0f1623" stroke="#2a3346" stroke-width="1.5"/>
-  <!-- Gold diamond -->
-  <polygon points="32,10 54,32 32,54 10,32" fill="#f5b041" stroke="#d49119" stroke-width="1" stroke-linejoin="round"/>
-  <!-- Teal pupil -->
-  <circle cx="32" cy="32" r="6.5" fill="#0b0e14"/>
-  <circle cx="32" cy="32" r="4" fill="#2dd4bf"/>
+  <!-- Oddsify Intel favicon — minimal editorial mark to match the home page.
+       Dark square plate, gold outer ring, mint signal dot. Sharp corners
+       (no border-radius) to mirror the home page's flat aesthetic. -->
+  <rect x="0" y="0" width="64" height="64" fill="#0B0F14"/>
+  <rect x="3" y="3" width="58" height="58" fill="none" stroke="#E8A33D" stroke-width="2"/>
+  <circle cx="32" cy="32" r="6" fill="#4FD1A5"/>
+  <circle cx="32" cy="32" r="10" fill="none" stroke="#4FD1A5" stroke-width="1.5" opacity="0.4"/>
 </svg>

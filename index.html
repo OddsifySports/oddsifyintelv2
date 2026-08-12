@@ -14,53 +14,68 @@
   <meta property="og:description" content="Live scores, weather, and matchup intel for every tracked league — free, fast, no signup.">
   <meta property="og:image" content="icons/icon-512.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-<style>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+  /* ----------------------------------------------------------------
+     Oddsify Sports design tokens
+     Mirrors the home page (https://www.oddsifysports.com/) palette and
+     typography. Single near-black surface, warm paper text, gold
+     accent #E8A33D, mint accent #4FD1A5, hairline #24303C rules,
+     sharp corners, IBM Plex Sans/Mono + Space Grotesk display.
+  ---------------------------------------------------------------- */
   :root{
-    --ink:#0A0E14;
-    --panel:#121926;
-    --panel-raised:#1A2331;
-    --panel-hi:#212C3D;
-    --line: rgba(140,160,190,0.14);
-    --line-strong: rgba(140,160,190,0.26);
-    --text:#F2F5F9;
-    --text-dim:#8D98AC;
-    --text-faint:#5C6779;
-    --live:#2FE88A;
-    --live-dim: rgba(47,232,138,0.14);
-    --red:#FF4B3E;
-    --red-dim: rgba(255,75,62,0.14);
-    --gold:#FFB93D;
-    --gold-dim: rgba(255,185,61,0.14);
-    --blue:#4FA8FF;
-    --radius:14px;
+    --bg: #0B0F14;
+    --ink: #0B0F14;
+    --panel: #121820;
+    --panel-raised: #182230;
+    --panel-hi: #182230;
+    --line: #24303C;
+    --line-strong: #2F3D4B;
+    --paper: #EDEDE3;
+    --text: #EDEDE3;
+    --text-dim: #8A94A0;
+    --text-faint: #5C6779;
+    --mint: #4FD1A5;
+    --mint-dim: rgba(79, 209, 165, 0.14);
+    --live: #4FD1A5;
+    --live-dim: rgba(79, 209, 165, 0.14);
+    --red: #E2574C;
+    --red-dim: rgba(226, 87, 76, 0.14);
+    --gold: #E8A33D;
+    --gold-dim: rgba(232, 163, 61, 0.14);
+    --blue: #4FA8FF;
+    --radius: 0px;
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-sans: 'IBM Plex Sans', sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
-  html,body{background:var(--ink); color:var(--text); font-family:'Inter',sans-serif; -webkit-font-smoothing:antialiased;}
+  html,body{background:var(--bg); color:var(--text); font-family:'IBM Plex Sans',sans-serif; -webkit-font-smoothing:antialiased;}
   body{
     background-image:
-      radial-gradient(1100px 600px at 12% -8%, rgba(47,232,138,0.06), transparent 55%),
-      radial-gradient(900px 520px at 100% 0%, rgba(79,168,255,0.06), transparent 50%);
+      radial-gradient(1100px 600px at 12% -8%, rgba(232,163,61,0.04), transparent 55%),
+      radial-gradient(900px 520px at 100% 0%, rgba(79,209,165,0.03), transparent 50%);
     padding-bottom:80px;
   }
   ::selection{ background: var(--gold-dim); color:var(--gold); }
   a{color:inherit; text-decoration:none;}
-  .mono{ font-family:'JetBrains Mono', monospace; }
-  .display{ font-family:'Teko', sans-serif; font-weight:600; letter-spacing:0.01em; }
+  .mono{ font-family:'IBM Plex Mono', monospace; }
+  .display{ font-family:'Space Grotesk', sans-serif; font-weight:600; letter-spacing:-0.01em; }
   svg{ display:block; }
 
   /* ---------- TICKER ---------- */
   .ticker-wrap{
-    background:#000; border-bottom:1px solid var(--line-strong);
+    background:var(--panel); border-bottom:1px solid var(--line); border-top:1px solid var(--line);
     overflow:hidden; white-space:nowrap; height:34px; display:flex; align-items:center;
   }
   .ticker-tag{
-    flex:0 0 auto; background:var(--red); color:#fff; font-family:'Inter',sans-serif;
-    font-weight:800; font-size:11px; letter-spacing:0.09em; padding:6px 12px; height:100%;
+    flex:0 0 auto; background:var(--gold); color:var(--bg); font-family:'IBM Plex Mono',monospace;
+    font-weight:600; font-size:10.5px; letter-spacing:0.12em; padding:6px 12px; height:100%;
     display:flex; align-items:center; z-index:2;
   }
   .ticker-track{ display:flex; align-items:center; animation: scroll-left 46s linear infinite; }
-  .ticker-track span{ padding:0 22px; font-size:12.5px; color:#c9d3e0; font-family:'JetBrains Mono',monospace; letter-spacing:0.02em; }
+  .ticker-track span{ padding:0 22px; font-size:12.5px; color:#c9d3e0; font-family:'IBM Plex Mono',monospace; letter-spacing:0.02em; }
   .ticker-track span b{ color:#fff; font-weight:700; }
   .ticker-track span.tag-live{ color:var(--live); }
   @keyframes scroll-left{ 0%{ transform:translateX(0); } 100%{ transform:translateX(-50%); } }
@@ -72,23 +87,26 @@
   }
   .brand{ display:flex; align-items:center; gap:12px; }
   .brand .mark{
-    width:42px; height:42px; border-radius:10px;
-    display:flex; align-items:center; justify-content:center; flex:0 0 auto;
-    overflow:hidden;
+    width:auto; height:auto; border-radius:0;
+    display:inline-flex; align-items:center; gap:8px; flex:0 0 auto;
+  }
+  .brand .mark .brand-dot{
+    width:6px; height:6px; border-radius:50%; background:var(--mint);
+    box-shadow: 0 0 0 3px rgba(79,209,165,0.12);
   }
   .brand .mark .brand-logo{ display:block; }
-  .brand h1{ font-family:'Teko',sans-serif; font-weight:600; font-size:30px; letter-spacing:0.01em; line-height:1; }
+  .brand h1{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:20px; letter-spacing:-0.01em; line-height:1; }
   .brand .sub{ font-size:11.5px; color:var(--text-dim); letter-spacing:0.04em; margin-top:3px; }
   .clockbox{ text-align:right; }
   .clockbox .place{ font-size:11px; color:var(--text-dim); letter-spacing:0.08em; text-transform:uppercase; margin-bottom:2px;}
-  .clockbox .time{ font-family:'JetBrains Mono',monospace; font-size:22px; font-weight:700; color:var(--gold); }
+  .clockbox .time{ font-family:'IBM Plex Mono',monospace; font-size:22px; font-weight:700; color:var(--gold); }
   .clockbox .date{ font-size:12px; color:var(--text-dim); margin-top:2px;}
 
   /* ---------- TABS ---------- */
   .tabbar-wrap{ position:sticky; top:0; z-index:50; background:rgba(10,14,20,0.92); backdrop-filter: blur(10px); border-bottom:1px solid var(--line); width:100%; flex:0 0 auto;}
   .tabbar{ max-width:1240px; width:100%; margin:0 auto; display:flex; gap:6px; padding:10px 28px; overflow-x:auto; }
   .tab-btn{
-    font-family:'Inter',sans-serif; font-weight:700; font-size:13px; letter-spacing:0.02em;
+    font-family:'IBM Plex Sans',sans-serif; font-weight:700; font-size:13px; letter-spacing:0.02em;
     color:var(--text-dim); background:transparent; border:1px solid transparent; padding:9px 16px;
     border-radius:999px; cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:7px;
     transition: all .15s ease;
@@ -107,7 +125,7 @@
   /* ---------- LEAGUE FILTER CHIPS ---------- */
   .chips{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:22px; }
   .chip{
-    font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:500; padding:7px 14px 7px 10px;
+    font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:500; padding:7px 14px 7px 10px;
     border-radius:8px; background:var(--panel); border:1px solid var(--line); color:var(--text-dim);
     cursor:pointer; display:flex; align-items:center; gap:8px; transition:.15s ease;
   }
@@ -122,8 +140,8 @@
   .league-section{ margin-bottom:34px; }
   .league-head{ display:flex; align-items:center; gap:11px; margin-bottom:13px; }
   .league-head .emblem{ width:38px; height:38px; flex:0 0 auto; }
-  .league-head h2{ font-family:'Teko',sans-serif; font-weight:600; font-size:22px; letter-spacing:0.02em; }
-  .league-head .count{ font-size:11.5px; color:var(--text-faint); font-family:'JetBrains Mono',monospace; }
+  .league-head h2{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:18px; letter-spacing:-0.01em; }
+  .league-head .count{ font-size:11.5px; color:var(--text-faint); font-family:'IBM Plex Mono',monospace; }
 
   .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:14px; }
 
@@ -135,21 +153,21 @@
   .card:hover{ border-color:var(--line-strong); transform:translateY(-2px); box-shadow:0 10px 24px rgba(0,0,0,0.35);}
   .card::before{ content:""; position:absolute; top:10px; right:10px; width:5px; height:5px; border-radius:50%; background:var(--line-strong); box-shadow: -10px 0 0 var(--line-strong); }
   .card-status{ display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
-  .badge{ font-size:10.5px; font-weight:800; letter-spacing:0.08em; padding:3px 8px; border-radius:5px; font-family:'Inter',sans-serif;}
+  .badge{ font-size:10.5px; font-weight:800; letter-spacing:0.08em; padding:3px 8px; border-radius:5px; font-family:'IBM Plex Sans',sans-serif;}
   .badge.live{ background:var(--red-dim); color:var(--red); display:flex; align-items:center; gap:5px; }
   .badge.live .d{ width:6px; height:6px; border-radius:50%; background:var(--red); animation:pulse 1.6s infinite; }
   .badge.final{ background:rgba(140,160,190,0.12); color:var(--text-dim); }
   .badge.sched{ background:var(--gold-dim); color:var(--gold); }
-  .card-time{ font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--text-dim); }
+  .card-time{ font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--text-dim); }
   .matchup{ display:flex; flex-direction:column; gap:9px; margin-bottom:10px; }
   .team-row{ display:flex; justify-content:space-between; align-items:center; }
   .team-name{ display:flex; align-items:center; gap:10px; }
   .badge-mono{ width:32px; height:32px; border-radius:9px; flex:0 0 auto; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12); }
   .badge-mono .sh{ position:absolute; top:-14px; left:-10px; width:34px; height:34px; background:rgba(255,255,255,0.16); border-radius:50%; filter:blur(1px); }
-  .badge-mono span{ font-family:'Teko',sans-serif; font-weight:700; font-size:14.5px; color:#fff; letter-spacing:0.01em; z-index:1; text-shadow:0 1px 2px rgba(0,0,0,0.25); }
-  .team-txt .ab{ font-family:'Teko',sans-serif; font-weight:600; font-size:20px; letter-spacing:0.02em; display:block; line-height:1.05; }
+  .badge-mono span{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:14.5px; color:#fff; letter-spacing:0.01em; z-index:1; text-shadow:0 1px 2px rgba(0,0,0,0.25); }
+  .team-txt .ab{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:16px; letter-spacing:-0.01em; display:block; line-height:1.05; }
   .team-txt .full{ font-size:10.5px; color:var(--text-faint); }
-  .score{ font-family:'JetBrains Mono',monospace; font-size:20px; font-weight:700; color:var(--text); min-width:26px; text-align:right; }
+  .score{ font-family:'IBM Plex Mono',monospace; font-size:20px; font-weight:700; color:var(--text); min-width:26px; text-align:right; }
   .score.dim{ color:var(--text-faint); font-weight:500; }
   .card-foot{ display:flex; justify-content:space-between; align-items:center; padding-top:10px; border-top:1px solid var(--line); font-size:11px; color:var(--text-faint); gap:10px; }
   .card-foot .venue{ display:flex; align-items:center; gap:7px; overflow:hidden; }
@@ -161,18 +179,18 @@
     background:var(--panel); border:1px dashed var(--line-strong); border-radius:var(--radius);
     padding:22px 20px; display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;
   }
-  .offday .l h3{ font-family:'Teko',sans-serif; font-size:20px; font-weight:600; color:var(--text-dim); letter-spacing:0.02em; }
+  .offday .l h3{ font-family:'Space Grotesk',sans-serif; font-size:20px; font-weight:600; color:var(--text-dim); letter-spacing:0.02em; }
   .offday .l p{ font-size:12.5px; color:var(--text-faint); margin-top:3px; max-width:460px; }
   .offday .r{ text-align:right; }
   .offday .r .lbl{ font-size:10.5px; color:var(--text-faint); letter-spacing:0.08em; text-transform:uppercase; }
-  .offday .r .val{ font-family:'JetBrains Mono',monospace; color:var(--gold); font-size:15px; margin-top:2px; }
+  .offday .r .val{ font-family:'IBM Plex Mono',monospace; color:var(--gold); font-size:15px; margin-top:2px; }
 
   /* ---------- NEWS / INJURY LIST ---------- */
   .feed-item{
     display:flex; gap:14px; padding:15px 4px; border-bottom:1px solid var(--line);
   }
   .feed-item:last-child{ border-bottom:none; }
-  .feed-tag{ flex:0 0 54px; font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-faint); padding-top:2px; letter-spacing:0.05em;}
+  .feed-tag{ flex:0 0 54px; font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--text-faint); padding-top:2px; letter-spacing:0.05em;}
   .feed-body h4{ font-size:14.5px; font-weight:700; margin-bottom:4px; line-height:1.35; }
   .feed-body p{ font-size:12.8px; color:var(--text-dim); line-height:1.55; }
   .feed-body .src{ font-size:10.5px; color:var(--text-faint); margin-top:7px; display:inline-flex; align-items:center; gap:5px; padding:4px 9px; border:1px solid var(--line); border-radius:999px; transition:.15s; }
@@ -195,28 +213,43 @@
   .wx-hero .left{ display:flex; align-items:center; gap:18px; }
   .wx-hero .left .icon{ width:64px; height:64px; }
   .wx-hero .left .eyebrow{ font-size:11px; letter-spacing:0.1em; color:var(--text-dim); text-transform:uppercase; margin-bottom:6px;}
-  .wx-hero .left .temp{ font-family:'Teko',sans-serif; font-size:78px; font-weight:600; line-height:0.9; color:var(--text); }
+  .wx-hero .left .temp{ font-family:'Space Grotesk',sans-serif; font-size:56px; font-weight:700; line-height:0.9; color:var(--text); letter-spacing:-0.02em; }
   .wx-hero .left .cond{ font-size:14px; color:var(--text-dim); margin-top:6px; }
   .wx-hero .right{ text-align:right; }
-  .wx-hero .right .hl{ font-family:'JetBrains Mono',monospace; font-size:15px; color:var(--gold); }
-  .wx-hero .right .lo{ font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--blue); margin-top:4px; }
+  .wx-hero .right .hl{ font-family:'IBM Plex Mono',monospace; font-size:15px; color:var(--gold); }
+  .wx-hero .right .lo{ font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--blue); margin-top:4px; }
   .wx-hero .right .precip{ font-size:11.5px; color:var(--text-faint); margin-top:8px; }
   .wx-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:14px; }
   .wx-card{ background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:16px; }
   .wx-card .top-row{ display:flex; justify-content:space-between; align-items:flex-start; }
-  .wx-card .city{ font-family:'Teko',sans-serif; font-size:19px; font-weight:600; }
+  .wx-card .city{ font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600; letter-spacing:-0.01em; }
   .wx-card .note{ font-size:10.5px; color:var(--text-faint); margin-bottom:4px; }
   .wx-card .icon{ width:34px; height:34px; flex:0 0 auto; }
-  .wx-card .t{ font-family:'JetBrains Mono',monospace; font-size:26px; font-weight:700; color:var(--text); margin-top:6px;}
+  .wx-card .t{ font-family:'IBM Plex Mono',monospace; font-size:26px; font-weight:700; color:var(--text); margin-top:6px;}
   .wx-card .c{ font-size:12px; color:var(--text-dim); margin-top:2px; }
-  .wx-card .range{ font-size:11px; color:var(--text-faint); margin-top:8px; font-family:'JetBrains Mono',monospace; }
+  .wx-card .range{ font-size:11px; color:var(--text-faint); margin-top:8px; font-family:'IBM Plex Mono',monospace; }
 
   /* ---------- LIVE TAB ---------- */
   .live-empty{ text-align:center; padding:60px 20px; color:var(--text-faint); }
-  .live-empty .big{ font-family:'Teko',sans-serif; font-size:26px; color:var(--text-dim); margin-bottom:6px;}
+  .live-empty .big{ font-family:'Space Grotesk',sans-serif; font-size:22px; font-weight:600; color:var(--text); letter-spacing:-0.01em; margin-bottom:6px;}
 
-  .section-title{ font-family:'Teko',sans-serif; font-weight:600; font-size:24px; letter-spacing:0.02em; margin-bottom:4px; display:flex; align-items:center; gap:10px;}
-  .section-sub{ font-size:12.5px; color:var(--text-faint); margin-bottom:20px; }
+  .section-title{
+    font-family:'IBM Plex Mono',monospace; font-weight:500; font-size:11px;
+    letter-spacing:0.18em; text-transform:uppercase; color:var(--gold);
+    margin-bottom:10px; display:flex; align-items:center; gap:10px;
+  }
+  .section-title::before{
+    content:""; width:8px; height:8px; background:var(--gold); display:inline-block;
+  }
+  .section-sub{
+    font-family:'Space Grotesk',sans-serif; font-size:18px; font-weight:600;
+    color:var(--text); margin-bottom:22px; letter-spacing:-0.01em;
+  }
+  /* section-sub visually pairs with .section-title like a headline + eyebrow */
+  .section-help{
+    font-size:13px; color:var(--text-dim); margin-bottom:24px; max-width:780px;
+    line-height:1.55;
+  }
 
   footer{ max-width:1240px; margin:40px auto 0; padding:20px 28px; border-top:1px solid var(--line); color:var(--text-faint); font-size:11px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;}
 
@@ -432,28 +465,31 @@
     .around-card {
       background: var(--panel);
       border: 1px solid var(--line);
-      border-radius: var(--radius);
+      border-top: 2px solid var(--line-strong);
       overflow: hidden;
       display: flex;
       flex-direction: column;
+      position: relative;
     }
     .around-head {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 10px;
-      padding: 12px 14px;
-      background: var(--panel-hi);
+      padding: 14px 18px;
+      background: transparent;
       border-bottom: 1px solid var(--line);
     }
     .around-head .league-id {
       display: inline-flex;
       align-items: center;
       gap: 10px;
-      font-family: var(--font-display);
-      font-size: 18px;
-      letter-spacing: 0.06em;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
       color: var(--text);
+      font-weight: 500;
     }
     .around-head .league-id img { width: 22px; height: 22px; object-fit: contain; }
     .around-head .weather-pill {
@@ -632,12 +668,23 @@
       display: flex;
       align-items: stretch;
       gap: 0;
-      padding: 14px 20px;
-      margin-bottom: 18px;
-      background: linear-gradient(135deg, var(--panel) 0%, var(--panel-hi) 100%);
+      padding: 24px 28px;
+      margin-bottom: 24px;
+      background: var(--panel);
       border: 1px solid var(--line);
-      border-radius: var(--radius);
+      border-top: 2px solid var(--gold);
       flex-wrap: wrap;
+      position: relative;
+    }
+    .weather-summary::after {
+      content: "INTEL — OPEN SOURCE";
+      position: absolute;
+      top: 8px;
+      right: 14px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9.5px;
+      letter-spacing: 0.15em;
+      color: var(--text-faint);
     }
     .ws-stat {
       display: flex;
@@ -786,11 +833,11 @@
     .weather-empty-hero {
       max-width: 540px;
       margin: 40px auto;
-      padding: 40px 28px;
+      padding: 48px 32px;
       text-align: center;
       background: var(--panel);
       border: 1px solid var(--line);
-      border-radius: var(--radius);
+      border-top: 2px solid var(--line-strong);
     }
     .weather-empty-glyph {
       font-size: 56px;
@@ -836,7 +883,7 @@
     }
     .sf-logo { display: block; flex-shrink: 0; }
     .sf-title {
-      font-family: 'Teko', sans-serif;
+      font-family: 'Space Grotesk', sans-serif;
       font-weight: 600;
       font-size: 22px;
       letter-spacing: 0.04em;
@@ -926,15 +973,10 @@
   <header class="top">
     <div class="brand">
       <div class="mark" id="brandMark" aria-hidden="true">
-        <svg class="brand-logo" viewBox="0 0 64 64" width="42" height="42" xmlns="http://www.w3.org/2000/svg">
-          <rect x="2" y="2" width="60" height="60" rx="13" fill="#0f1623" stroke="#2a3346" stroke-width="1.5"/>
-          <polygon points="32,10 54,32 32,54 10,32" fill="#f5b041" stroke="#d49119" stroke-width="1" stroke-linejoin="round"/>
-          <circle cx="32" cy="32" r="6.5" fill="#0b0e14"/>
-          <circle cx="32" cy="32" r="4" fill="#2dd4bf"/>
-        </svg>
+        <span class="brand-dot"></span>
       </div>
       <div>
-        <h1>ODDSIFY INTEL</h1>
+        <h1>Oddsify <span style="color:var(--text-dim)">·</span> Intel</h1>
         <div class="sub">MLB · NBA · NCAAB · EPL · UCL · MLS · USLC — LIVE FROM ESPN</div>
       </div>
     </div>
@@ -967,8 +1009,9 @@
 
     <!-- ================= GAMES TAB ================= -->
     <section class="panel-view active" id="view-games">
-      <div class="section-title">Today's Schedule</div>
-      <div class="section-sub">Live scores &amp; lineups across every tracked league. Times shown in your local browser timezone (override per-league where ESPN publishes ET).</div>
+      <div class="section-title">The Slate</div>
+      <div class="section-sub">Today's Schedule</div>
+      <div class="section-help">Live scores &amp; lineups across every tracked league. Times shown in your local browser timezone (override per-league where ESPN publishes ET).</div>
       <div class="league-filter" id="leagueFilter" role="toolbar" aria-label="Filter by league">
         <!-- chips injected by js/app.js -->
       </div>
@@ -977,29 +1020,33 @@
 
     <!-- ================= LIVE TAB ================= -->
     <section class="panel-view" id="view-live">
-      <div class="section-title">Live Right Now</div>
-      <div class="section-sub">Games currently in progress across all leagues, updated every 60 seconds.</div>
+      <div class="section-title">In Progress</div>
+      <div class="section-sub">Live Right Now</div>
+      <div class="section-help">Games currently in progress across all leagues, updated every 60 seconds.</div>
       <div class="grid" id="liveContainer"></div>
     </section>
 
     <!-- ================= NEWS TAB ================= -->
     <section class="panel-view" id="view-news">
-      <div class="section-title">League News</div>
-      <div class="section-sub">Top headlines making news today, by league. Tap a card to read the full story.</div>
+      <div class="section-title">The Wire</div>
+      <div class="section-sub">League News</div>
+      <div class="section-help">Top headlines making news today, by league. Tap a card to read the full story.</div>
       <div id="newsContainer"></div>
     </section>
 
     <!-- ================= WEATHER TAB ================= -->
     <section class="panel-view" id="view-weather">
-      <div class="section-title">Weather at Today's Venues</div>
-      <div class="section-sub">Live conditions for every outdoor venue playing today. Indoor / dome games are listed without weather.</div>
+      <div class="section-title">Conditions</div>
+      <div class="section-sub">Weather at Today's Venues</div>
+      <div class="section-help">Live conditions for every outdoor venue playing today. Indoor / dome games are listed without weather.</div>
       <div id="weatherContainer"></div>
     </section>
 
     <!-- ================= INJURIES TAB ================= -->
     <section class="panel-view" id="view-injuries">
-      <div class="section-title">Injury Report</div>
-      <div class="section-sub" id="injuriesSub">Notable injury and availability updates from today's reporting.</div>
+      <div class="section-title">Availability</div>
+      <div class="section-sub">Injury Report</div>
+      <div class="section-help" id="injuriesSub">Notable injury and availability updates from today's reporting.</div>
       <div id="injuriesContainer"></div>
     </section>
 
@@ -1009,13 +1056,12 @@
     <div class="sf-inner">
       <div class="sf-brand">
         <svg class="sf-logo" viewBox="0 0 64 64" width="32" height="32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <rect x="2" y="2" width="60" height="60" rx="13" fill="#0f1623" stroke="#2a3346" stroke-width="1.5"/>
-          <polygon points="32,10 54,32 32,54 10,32" fill="#f5b041" stroke="#d49119" stroke-width="1" stroke-linejoin="round"/>
-          <circle cx="32" cy="32" r="6.5" fill="#0b0e14"/>
-          <circle cx="32" cy="32" r="4" fill="#2dd4bf"/>
+          <rect x="0" y="0" width="64" height="64" fill="#0B0F14"/>
+          <rect x="3" y="3" width="58" height="58" fill="none" stroke="#E8A33D" stroke-width="2"/>
+          <circle cx="32" cy="32" r="6" fill="#4FD1A5"/>
         </svg>
         <div>
-          <div class="sf-title">ODDSIFY INTEL</div>
+          <div class="sf-title">ODDSIFY · INTEL</div>
           <div class="sf-sub">Live sports dashboard · Free · Built for Phoenix</div>
         </div>
       </div>
