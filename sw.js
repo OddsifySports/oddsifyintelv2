@@ -10,9 +10,9 @@
  * Install: Automatically registered by browser if served over HTTPS (or localhost)
  */
 
-const CACHE_NAME = 'oddsify-intel-v11';
-const STATIC_CACHE = 'oddsify-static-v11';
-const API_CACHE = 'oddsify-api-v11';
+const CACHE_NAME = 'oddsify-intel-v12';
+const STATIC_CACHE = 'oddsify-static-v12';
+const API_CACHE = 'oddsify-api-v12';
 
 // Static assets to cache immediately
 const STATIC_ASSETS = [
@@ -25,8 +25,11 @@ const STATIC_ASSETS = [
   '/js/render.js',
   '/js/app.js',
   '/favicon.ico',
+  '/favicon.svg',
+  '/icons/icon-180.png',
   '/icons/icon-192.png',
   '/icons/icon-512.png',
+  '/site.webmanifest',
 ];
 
 // API endpoints to cache (only the local proxy; direct ESPN hosts

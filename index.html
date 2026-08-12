@@ -4,7 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Oddsify Intel — Live Sports Dashboard</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+  <link rel="manifest" href="site.webmanifest">
+  <meta name="theme-color" content="#0b0e14">
+  <meta name="description" content="Oddsify Intel — live scores, schedules, odds, weather, and matchup intel across MLB, NBA, NCAAB, EPL, Champions League, MLS, and USL Championship.">
+  <meta property="og:title" content="Oddsify Intel">
+  <meta property="og:description" content="Live scores, weather, and matchup intel for every tracked league — free, fast, no signup.">
+  <meta property="og:image" content="icons/icon-512.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -63,9 +72,11 @@
   }
   .brand{ display:flex; align-items:center; gap:12px; }
   .brand .mark{
-    width:42px; height:42px; border-radius:10px; background:linear-gradient(155deg,var(--live),#18a865);
+    width:42px; height:42px; border-radius:10px;
     display:flex; align-items:center; justify-content:center; flex:0 0 auto;
+    overflow:hidden;
   }
+  .brand .mark .brand-logo{ display:block; }
   .brand h1{ font-family:'Teko',sans-serif; font-weight:600; font-size:30px; letter-spacing:0.01em; line-height:1; }
   .brand .sub{ font-size:11.5px; color:var(--text-dim); letter-spacing:0.04em; margin-top:3px; }
   .clockbox{ text-align:right; }
@@ -774,6 +785,107 @@
       font-size: 13.5px;
       line-height: 1.55;
     }
+
+    /* ---------- site footer ---------- */
+    .site-footer {
+      margin-top: 60px;
+      padding: 36px 28px 22px;
+      background: linear-gradient(180deg, transparent, rgba(245, 176, 65, 0.03) 100%);
+      border-top: 1px solid var(--line);
+      color: var(--text-dim);
+      font-family: var(--font-display);
+    }
+    .sf-inner {
+      max-width: 1240px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.2fr 2fr;
+      gap: 36px;
+      padding-bottom: 28px;
+    }
+    .sf-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .sf-logo { display: block; flex-shrink: 0; }
+    .sf-title {
+      font-family: 'Teko', sans-serif;
+      font-weight: 600;
+      font-size: 22px;
+      letter-spacing: 0.04em;
+      color: var(--paper);
+      line-height: 1;
+    }
+    .sf-sub {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-faint);
+      letter-spacing: 0.04em;
+      margin-top: 6px;
+    }
+    .sf-cols {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .sf-col { display: flex; flex-direction: column; gap: 8px; }
+    .sf-head {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--gold);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .sf-link {
+      font-family: var(--font-display);
+      font-size: 14px;
+      letter-spacing: 0.03em;
+      color: var(--text-dim);
+      text-decoration: none;
+      background: none;
+      border: none;
+      padding: 0;
+      text-align: left;
+      cursor: pointer;
+      transition: color .12s;
+    }
+    .sf-link:hover { color: var(--gold); }
+    .sf-meta {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--text-faint);
+      line-height: 1.5;
+    }
+    .sf-bottom {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-faint);
+      letter-spacing: 0.04em;
+    }
+    .sf-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .sf-status .status-dot { width: 8px; height: 8px; }
+    @media (max-width: 860px) {
+      .sf-inner { grid-template-columns: 1fr; gap: 24px; }
+      .sf-cols { grid-template-columns: repeat(2, 1fr); }
+      .sf-bottom { flex-direction: column; align-items: flex-start; gap: 8px; }
+    }
+    @media (max-width: 540px) {
+      .sf-cols { grid-template-columns: 1fr; }
+    }
   </style>
   <!-- V1 content styles (game-card, weather-card, league-section, modal, news-grid) -->
   <link rel="stylesheet" href="css/styles.css?v=7">
@@ -787,7 +899,14 @@
 
   <header class="top">
     <div class="brand">
-      <div class="mark" id="brandMark"></div>
+      <div class="mark" id="brandMark" aria-hidden="true">
+        <svg class="brand-logo" viewBox="0 0 64 64" width="42" height="42" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="60" height="60" rx="13" fill="#0f1623" stroke="#2a3346" stroke-width="1.5"/>
+          <polygon points="32,10 54,32 32,54 10,32" fill="#f5b041" stroke="#d49119" stroke-width="1" stroke-linejoin="round"/>
+          <circle cx="32" cy="32" r="6.5" fill="#0b0e14"/>
+          <circle cx="32" cy="32" r="4" fill="#2dd4bf"/>
+        </svg>
+      </div>
       <div>
         <h1>ODDSIFY INTEL</h1>
         <div class="sub">MLB · NBA · NCAAB · EPL · UCL · MLS · USLC — LIVE FROM ESPN</div>
@@ -860,9 +979,49 @@
 
   </main>
 
-  <footer>
-    <span>Built for Phoenix (America/Phoenix, no DST) · Live sports data via ESPN's public scoreboard, standings, news, injuries &amp; summary endpoints, proxied through /api/espn</span>
-    <span>Free, informational use only — not a wagering recommendation</span>
+  <footer class="site-footer">
+    <div class="sf-inner">
+      <div class="sf-brand">
+        <svg class="sf-logo" viewBox="0 0 64 64" width="32" height="32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect x="2" y="2" width="60" height="60" rx="13" fill="#0f1623" stroke="#2a3346" stroke-width="1.5"/>
+          <polygon points="32,10 54,32 32,54 10,32" fill="#f5b041" stroke="#d49119" stroke-width="1" stroke-linejoin="round"/>
+          <circle cx="32" cy="32" r="6.5" fill="#0b0e14"/>
+          <circle cx="32" cy="32" r="4" fill="#2dd4bf"/>
+        </svg>
+        <div>
+          <div class="sf-title">ODDSIFY INTEL</div>
+          <div class="sf-sub">Live sports dashboard · Free · Built for Phoenix</div>
+        </div>
+      </div>
+      <div class="sf-cols">
+        <div class="sf-col">
+          <div class="sf-head">Product</div>
+          <a class="sf-link" href="#tab-games" data-jump="games">Games</a>
+          <a class="sf-link" href="#tab-live" data-jump="live">Live scores</a>
+          <a class="sf-link" href="#tab-news" data-jump="news">News</a>
+          <a class="sf-link" href="#tab-weather" data-jump="weather">Weather</a>
+          <a class="sf-link" href="#tab-injuries" data-jump="injuries">Injuries</a>
+        </div>
+        <div class="sf-col">
+          <div class="sf-head">Resources</div>
+          <a class="sf-link" href="https://site.api.espn.com/apis/site/v2/sports" target="_blank" rel="noopener">ESPN scoreboard API</a>
+          <a class="sf-link" href="https://www.espn.com/" target="_blank" rel="noopener">ESPN.com</a>
+          <button class="sf-link sf-link-btn" type="button" id="footerSettingsBtn">Settings</button>
+        </div>
+        <div class="sf-col">
+          <div class="sf-head">Legal</div>
+          <span class="sf-meta">Data via ESPN's public APIs. Trademarks belong to their respective owners.</span>
+          <span class="sf-meta">Oddsify Intel is informational only — not a wagering recommendation.</span>
+        </div>
+      </div>
+    </div>
+    <div class="sf-bottom">
+      <span>© <span id="copyYear">2026</span> Oddsify Labs · Phoenix, AZ · America/Phoenix (no DST)</span>
+      <span class="sf-status">
+        <span class="status-dot" id="footerStatusDot" aria-hidden="true"></span>
+        <span id="footerStatusText">live</span>
+      </span>
+    </div>
   </footer>
 
   <div class="modal-overlay" id="modal-overlay" hidden>
@@ -920,7 +1079,7 @@
   <script src="js/api.js"></script>
   <script src="js/render.js?v=9"></script>
   <!-- V2 bootstrap: wires v1's render functions into v2's chrome (header, clock, tabs, ticker, panels) -->
-  <script src="js/app.js?v=12"></script>
+  <script src="js/app.js?v=13"></script>
   
 </body>
 </html>

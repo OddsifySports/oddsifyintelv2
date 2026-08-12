@@ -128,6 +128,11 @@
   function setStatus(state, text) {
     statusDot.className = "status-dot " + (state || "");
     statusText.textContent = text;
+    // Mirror to footer status pill
+    const fd = $("footerStatusDot");
+    const ft = $("footerStatusText");
+    if (fd) fd.className = "status-dot " + (state || "");
+    if (ft) ft.textContent = text;
   }
 
   let lastResults = [];
@@ -499,6 +504,19 @@
   settingsClose.addEventListener("click", closeSettings);
   settingsDone.addEventListener("click", closeSettings);
   settingsOverlay.addEventListener("click", (e) => { if (e.target === settingsOverlay) closeSettings(); });
+  // Footer-mirrored settings button
+  const footerSettingsBtn = $("footerSettingsBtn");
+  if (footerSettingsBtn) footerSettingsBtn.addEventListener("click", openSettings);
+  // Footer year + tab-jump shortcuts
+  const copyYearEl = $("copyYear");
+  if (copyYearEl) copyYearEl.textContent = String(new Date().getFullYear());
+  document.querySelectorAll(".sf-link[data-jump]").forEach((a) => {
+    a.addEventListener("click", (e) => {
+      e.preventDefault();
+      selectTab(a.dataset.jump);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !settingsOverlay.hidden) closeSettings(); });
 
   settingsTz.addEventListener("change", () => {
